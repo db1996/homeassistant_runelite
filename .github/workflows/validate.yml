@@ -1,14 +1,2 @@
-- name: HACS Action
-    uses: "hacs/action@22.5.0"
-    with:
-      # A space seperated list of ignored checks, for valid entries see README.md
-      ignore: # optional, default is 
-      # The category of repository
-      category: 
-      # The full name of repository
-      repository: # optional
-      # Post a comment to the PR with the result of the checks
-      comment: # optional, default is true
-      # Personal access token (PAT)
-      github_token: # optional, default is ${{ github.token }}
-          
+- name: "HACS Action"
+  uses: hacs/action@22.5.0
