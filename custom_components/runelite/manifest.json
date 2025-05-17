@@ -1,0 +1,14 @@
+{
+  "domain": "runelite",
+  "name": "Runelite",
+  "codeowners": [
+    "@db1996"
+  ],
+  "config_flow": true,
+  "dependencies": [],
+  "documentation": "https://www.home-assistant.io/integrations/runelite",
+  "integration_type": "hub",
+  "iot_class": "calculated",
+  "requirements": [],
+  "version": "2025.01.01"
+}

@@ -1,0 +1,530 @@
+# Example services.yaml for your RuneLite Farming integration
+set_multi_entity_data:
+  name: Set Multiple Entity Data
+  description: Update multiple farming patch entities in a single call.
+  fields:
+    entities:
+      required: true
+      name: Entities
+      description: A list of entities and their associated data to update.
+      example:
+        - entity_id: sensor.runelite_username_farming_contract
+          completion_time: "2025-05-17T17:00+00:00"
+          status: in_progress
+          crop_type: ranarr
+          patch_type: herb
+        - entity_id: sensor.runelite_username_tree_patch
+          status: ready
+
+set_entity_data:
+  name: Set Entity Data
+  description: Manually set the entity data for a farming patch.
+  fields:
+    entity_id:
+      required: true
+      name: Entity ID
+      description: The entity ID of the farming patch sensor.
+      selector:
+        entity:
+          domain: sensor
+          integration: runelite
+    patch_type:
+      required: false
+      name: Patch Type
+      description: The type of farming patch. Herb, Hespori, Fruit tree, Flower, Mushroom, Cactus and Potato cactus do not have crop types. They all have the same amount of growth ticks for each patch
+      selector:
+        select:
+          options:
+            - herb
+            - hespori
+            - tree
+            - fruit_tree
+            - cactus
+            - hardwood
+            - spirit_tree
+            - allotment
+            - bush
+            - flower
+            - mushroom
+            - potato_cactus
+    crop_type:
+      required: false
+      name: Crop Type
+      description: The type of crop planted. This overwrites patch selection
+      selector:
+        select:
+          options:
+            - oak
+            - willow
+            - maple
+            - yew
+            - magic
+            - strawberry
+            - watermelon
+            - snape_grass
+            - teak
+            - mahogany
+            - whiteberry
+            - poison_ivy
+            - jangerberry
+            - redberry
+            - cadavaberry
+            - dwellberry
+            - potato
+            - onion
+            - cabbage
+            - tomato
+            - sweetcorn
+    completion_time:
+      required: false
+      name: Completion Time
+      description: The time the patch will be completed (ISO 8601 format).
+      selector:
+        datetime:
+    status:
+      required: false
+      name: Status
+      description: The current status of the patch (e.g., 'in_progress', 'ready').
+      selector:
+        select:
+          options:
+            - in_progress
+            - ready
+            - other
+            - diseased
+            - dead
+            - harvested
+            - not_planted
+
+calculate_patch_or_crop:
+  name: Calculate Patch or Crop
+  description: Calculates the completion time for a farming patch or crop.
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+    patch_type:
+      required: false
+      name: Patch Type
+      description: The type of farming patch. Herb, Hespori, Fruit tree, Flower, Mushroom, Cactus and Potato cactus do not have crop types. They all have the same amount of growth ticks for each patch
+      selector:
+        select:
+          options:
+            - herb
+            - hespori
+            - tree
+            - fruit_tree
+            - cactus
+            - hardwood
+            - spirit_tree
+            - allotment
+            - bush
+            - flower
+            - mushroom
+            - potato_cactus
+    crop_type:
+      required: false
+      name: Crop Type
+      description: The type of crop planted. This overwrites patch selection
+      selector:
+        select:
+          options:
+            - oak
+            - willow
+            - maple
+            - yew
+            - magic
+            - strawberry
+            - watermelon
+            - snape_grass
+            - teak
+            - mahogany
+            - whiteberry
+            - poison_ivy
+            - jangerberry
+            - redberry
+            - cadavaberry
+            - dwellberry
+            - potato
+            - onion
+            - cabbage
+            - tomato
+            - sweetcorn
+calculate_farming_contract:
+  name: Calculate Farming Contract
+  description: Calculates the farming contract completion time by patch/crop.
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+    patch_type:
+      required: false
+      name: Patch Type
+      description: The type of farming patch. Herb, Hespori, Fruit tree, Flower, Mushroom, Cactus and Potato cactus do not have crop types. They all have the same amount of growth ticks for each patch
+      selector:
+        select:
+          options:
+            - herb
+            - hespori
+            - tree
+            - fruit_tree
+            - cactus
+            - hardwood
+            - spirit_tree
+            - allotment
+            - bush
+            - flower
+            - mushroom
+            - potato_cactus
+    crop_type:
+      required: false
+      name: Crop Type
+      description: The type of crop planted. This overwrites patch selection
+      selector:
+        select:
+          options:
+            - oak
+            - willow
+            - maple
+            - yew
+            - magic
+            - strawberry
+            - watermelon
+            - snape_grass
+            - teak
+            - mahogany
+            - whiteberry
+            - poison_ivy
+            - jangerberry
+            - redberry
+            - cadavaberry
+            - dwellberry
+            - potato
+            - onion
+            - cabbage
+            - tomato
+            - sweetcorn
+
+set_farming_tick_offset:
+  name: Set Farming Tick Offset
+  description: Sets the farming tick offset for a specific patch.
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+    farming_tick_offset:
+      required: true
+      name: Tick Offset
+      description: The tick offset to set for the farming patch. You can find this 
+      selector:
+        number:
+          min: -30
+          max: 30
+          step: 1
+
+reset_birdhouses:
+  name: Reset Birdhouses
+  description: Resets the birdhouse timers
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+
+# Directly calculate the completion time for each patch type
+herb_patch:
+  name: Calculate Herb Patch
+  description: The herb patch completion time is calculated
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+tree_patch:
+  name: Calculate Tree Patch
+  description: The tree patch completion time is calculated
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+    crop_type:
+      required: true
+      name: Tree type
+      description: The type of tree
+      selector:
+        select:
+          options: 
+            - oak
+            - willow
+            - maple
+            - yew
+            - magic
+fruit_tree_patch:
+  name: Calculate Fruit Tree Patch
+  description: The fruit tree patch completion time is calculated
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+bush_patch:
+  name: Calculate Bush Patch
+  description: The bush patch completion time is calculated
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+    crop_type:
+      required: true
+      name: Bush type
+      description: The type of bush
+      selector:
+        select:
+          options: 
+            - whiteberry
+            - poison_ivy
+            - jangerberry
+            - redberry
+            - cadavaberry
+            - dwellberry
+hespori_patch:
+  name: Calculate Hespori Patch
+  description: The hespori patch completion time is calculated
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+hardwood_patch:
+  name: Calculate Hardwood Patch
+  description: The hardwood patch completion time is calculated
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+    crop_type:
+      required: true
+      name: Hardwood type
+      description: The type of hardwood tree
+      selector:
+        select:
+          options: 
+            - teak
+            - mahogany
+allotment_patch:
+  name: Calculate Allotment Patch
+  description: The allotment patch completion time is calculated
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+    crop_type:
+      required: true
+      name: Allotment type
+      description: The type of allotment crop
+      selector:
+        select:
+          options: 
+            - potato
+            - onion
+            - cabbage
+            - tomato
+            - sweetcorn
+            - strawberry
+            - watermelon
+            - snape_grass
+flower_patch:
+  name: Calculate Flower Patch
+  description: The flower patch completion time is calculated
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+cactus_patch:
+  name: Calculate Cactus Patch
+  description: The cactus patch completion time is calculated
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+potato_cactus_patch:
+  name: Calculate Potato Cactus Patch
+  description: The potato cactus patch completion time is calculated
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+mushroom_patch:
+  name: Calculate Mushroom Patch
+  description: The mushroom patch completion time is calculated
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+spirit_tree_patch:
+  name: Calculate Spirit Tree Patch
+  description: The spirit tree patch completion time is calculated
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+redwood_patch:
+  name: Calculate Redwood Patch
+  description: The redwood patch completion time is calculated
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+
+# Set Farming contract to specific patches
+farming_contract_allotment:
+  name: Calculate Farming Contract Allotment
+  description: The farming contract completion time is calculated
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+    crop_type:
+      required: true
+      name: Allotment type
+      description: The type of allotment crop
+      selector:
+        select:
+          options: 
+            - potato
+            - onion
+            - cabbage
+            - tomato
+            - sweetcorn
+            - strawberry
+            - watermelon
+            - snape_grass
+farming_contract_bush:
+  name: Calculate Farming Contract Bush
+  description: The farming contract completion time is calculated
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+    crop_type:
+      required: true
+      name: Bush type
+      description: The type of bush
+      selector:
+        select:
+          options: 
+            - whiteberry
+            - poison_ivy
+            - jangerberry
+            - redberry
+            - cadavaberry
+            - dwellberry
+farming_contract_cactus:
+  name: Calculate Farming Contract Cactus
+  description: The farming contract completion time is calculated
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+farming_contract_potato_cactus:
+  name: Calculate Farming Contract Potato Cactus
+  description: The farming contract completion time is calculated
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+farming_contract_flower:
+  name: Calculate Farming Contract Flower
+  description: The farming contract completion time is calculated
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+farming_contract_fruit_tree:
+  name: Calculate Farming Contract Fruit Tree
+  description: The farming contract completion time is calculated
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+farming_contract_herb:
+  name: Calculate Farming Contract Herb
+  description: The farming contract completion time is calculated
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+farming_contract_tree:
+  name: Calculate Farming Contract Tree
+  description: The farming contract completion time is calculated
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+    crop_type:
+      required: true
+      name: Tree type
+      description: The type of tree
+      selector:
+        select:
+          options: 
+            - oak
+            - willow
+            - maple
+            - yew
+            - magic
+farming_contract_redwood:
+  name: Calculate Farming Contract Redwood
+  description: The farming contract completion time is calculated
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
