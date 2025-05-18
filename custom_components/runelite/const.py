@@ -214,8 +214,9 @@ PATCH_TYPE_DATA = {
     },
     "seaweed": {
         "has_farming_contract": False,
+        "global_cycles": 4,
         "cycle_length_minutes": 10,
-        "global_cycles": 4
+        "growth_ticks": ["*:00", "*:10", "*:20", "*:30", "*:40", "*:50"],
     },
 }
 
