@@ -196,6 +196,10 @@ PATCH_TYPE_DATA = {
             "4": ["02:40", "13:20"],
         },
     },
+    "seaweed": {
+        "cycle_length_minutes": 10,
+        "global_cycles": 4
+    },
 }
 
 CROP_TYPE_DATA = {
