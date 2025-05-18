@@ -140,8 +140,8 @@ It sets the entity of the corresponding patch to in_progress and sets the comple
 |**Inputs**|Info|
 |----|----|
 |Username|Only needed if you have more than 1 username hub added to the integration.
-|Patch Type|Each patch type has it's own growth tick cycle. The reason cactus and potato cactus are seperate is because they have very different cycles. A technical limitation<br>`herb`,`hespori`,`tree`,`fruit_tree`,`cactus`,`hardwood`,`spirit_tree`,`allotment`,`bush`,`flower`,`mushroom`,`potato_cactus`
-|Crop Type|If this is set to a crop of a different patch type than the patch type input, it will override the patch type.<br>`oak`,`willow`,`maple`,`yew`,`magic`,`strawberry`,`watermelon`,`snape_grass`,`teak`,`mahogany`,`whiteberry`,`poison_ivy`,`jangerberry`,`redberry`,`cadavaberry`,`dwellberry`,`potato`,`onion`,`cabbage`,`tomato`,`sweetcorn`
+|Patch Type|Each patch type has it's own growth tick cycle.<br> The reason cactus and potato cactus are seperate is because they have very different cycles. A technical limitation<br>`herb`,`hespori`,`tree`,`fruit_tree`<br>`cactus`,`hardwood`,`spirit_tree`,`allotment`,`bush`,`flower`,`mushroom`,`potato_cactus`
+|Crop Type|If this is set to a crop of a different patch type than the patch type input, it will override the patch type.<br>`oak`,`willow`,`maple`,`yew`,`magic`,<br>`strawberry`,`watermelon`,`snape_grass`,`teak`,`mahogany`<br>`whiteberry`,`poison_ivy`,`jangerberry`,`redberry`,`cadavaberry`,`dwellberry`<br>`potato`,`onion`,`cabbage`,`tomato`,`sweetcorn`
 
 ### calculate_farming_contract
 
@@ -150,8 +150,8 @@ This does the exact same as the above. But instead of setting the patch type ent
 |**Inputs**|Info|
 |----|----|
 |Username|Only needed if you have more than 1 username hub added to the integration.
-|Patch Type|Each patch type has it's own growth tick cycle. The reason cactus and potato cactus are seperate is because they have very different cycles. A technical limitation<br>`herb`,`hespori`,`tree`,`fruit_tree`,`cactus`,`hardwood`,`spirit_tree`,`allotment`,`bush`,`flower`,`mushroom`,`potato_cactus`
-|Crop Type|If this is set to a crop of a different patch type than the patch type input, it will override the patch type.<br>`oak`,`willow`,`maple`,`yew`,`magic`,`strawberry`,`watermelon`,`snape_grass`,`teak`,`mahogany`,`whiteberry`,`poison_ivy`,`jangerberry`,`redberry`,`cadavaberry`,`dwellberry`,`potato`,`onion`,`cabbage`,`tomato`,`sweetcorn`
+|Patch Type|Each patch type has it's own growth tick cycle.<br> The reason cactus and potato cactus are seperate is because they have very different cycles. A technical limitation<br>`herb`,`hespori`,`tree`,`fruit_tree`,<br>`cactus`,`hardwood`,`spirit_tree`,`allotment`,`bush`,`flower`,`mushroom`,`potato_cactus`
+|Crop Type|If this is set to a crop of a different patch type than the patch type input, it will override the patch type.<br>`oak`,`willow`,`maple`,`yew`,`magic`<br>`strawberry`,`watermelon`,`snape_grass`,`teak`,`mahogany`<br>`whiteberry`,`poison_ivy`,`jangerberry`,`redberry`,`cadavaberry`,`dwellberry`<br>`potato`,`onion`,`cabbage`,`tomato`,`sweetcorn`
 
 
 ### Shortcut services
