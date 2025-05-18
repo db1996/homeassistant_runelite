@@ -5,6 +5,7 @@ DOMAIN = "runelite"
 SENSOR_PREFIX = "runelite "
 PATCH_TYPE_DATA = {
     "flower": {
+        "has_farming_contract": True,
         "cycle_length_minutes": 5,
         "global_cycles": 4,
         "growth_ticks": [
@@ -23,16 +24,23 @@ PATCH_TYPE_DATA = {
         ],
     },
     "allotment": {  # done
+        "has_farming_contract": True,
         "cycle_length_minutes": 10,
         "growth_ticks": ["*:00", "*:10", "*:20", "*:30", "*:40", "*:50"],
     },
     "herb": {
+        "has_farming_contract": True,
         "cycle_length_minutes": 20,
         "global_cycles": 4,
         "growth_ticks": ["*:00", "*:20", "*:40"],
     },
-    "bush": {"cycle_length_minutes": 20, "growth_ticks": ["*:00", "*:20", "*:40"]},
+    "bush": {
+        "has_farming_contract": True,
+        "cycle_length_minutes": 20, 
+        "growth_ticks": ["*:00", "*:20", "*:40"]
+    },
     "tree": {  # done
+        "has_farming_contract": True,
         "cycle_length_minutes": 40,
         "growth_ticks": [
             "00:00",
@@ -74,6 +82,7 @@ PATCH_TYPE_DATA = {
         ],
     },
     "mushroom": {
+        "has_farming_contract": False,
         "cycle_length_minutes": 40,
         "global_cycles": 4,
         "growth_ticks": [
@@ -116,6 +125,7 @@ PATCH_TYPE_DATA = {
         ],
     },
     "cactus": {  # done
+        "has_farming_contract": True,
         "cycle_length_minutes": 80,
         "global_cycles": 7,
         "growth_ticks": [
@@ -140,11 +150,13 @@ PATCH_TYPE_DATA = {
         ],
     },
     "potato_cactus": {  # done
+        "has_farming_contract": True,
         "cycle_length_minutes": 10,
         "global_cycles": 7,
         "growth_ticks": ["*:00", "*:10", "*:20", "*:30", "*:40", "*:50"],
     },
     "fruit_tree": {
+        "has_farming_contract": False,
         "cycle_length_minutes": 160,
         "global_cycles": 6,
         "growth_ticks": [
@@ -160,6 +172,7 @@ PATCH_TYPE_DATA = {
         ],
     },
     "spirit_tree": {
+        "has_farming_contract": False,
         "cycle_length_minutes": 320,
         "global_cycles": 12,
         "growth_ticks_days": {
@@ -168,6 +181,7 @@ PATCH_TYPE_DATA = {
         },
     },
     "hardwood": {
+        "has_farming_contract": False,
         "cycle_length_minutes": 640,
         "growth_ticks_days": {
             "1": ["00:00", "10:40", "21:20"],
@@ -177,6 +191,7 @@ PATCH_TYPE_DATA = {
         },
     },
     "redwood": {
+        "has_farming_contract": True,
         "cycle_length_minutes": 640,
         "global_cycles": 10,
         "growth_ticks_days": {
@@ -187,6 +202,7 @@ PATCH_TYPE_DATA = {
         },
     },
     "hespori": {
+        "has_farming_contract": False,
         "cycle_length_minutes": 640,
         "global_cycles": 3,
         "growth_ticks_days": {
@@ -197,6 +213,7 @@ PATCH_TYPE_DATA = {
         },
     },
     "seaweed": {
+        "has_farming_contract": False,
         "cycle_length_minutes": 10,
         "global_cycles": 4
     },

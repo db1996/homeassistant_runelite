@@ -99,6 +99,28 @@ class RuneLiteFarmingServices:
 
     def setup_services(self):
         """Register the services in Home Assistant."""
+        for patch_type, data in PATCH_TYPE_DATA.items():
+            needs_crop = "global_cycles" not in data
+            patch_schema = SET_PATCH_WITH_CROP_SCHEMA if needs_crop else SET_PATCH_DIRECTLY_SCHEMA
+
+            patch_service_name = f"{patch_type}_patch"
+            _LOGGER.debug(f"Registering service: {patch_service_name}, {data.get('has_farming_contract')}")
+            self.hass.services.async_register(
+                DOMAIN,
+                patch_service_name,
+                self._make_patch_handler(patch_type, is_contract=False, needs_crop=needs_crop),
+                schema=patch_schema
+            )
+
+            if data.get("has_farming_contract"):
+                contract_service_name = f"farming_contract_{patch_type}"
+                _LOGGER.debug(f"Registering service: {contract_service_name}")
+                self.hass.services.async_register(
+                    DOMAIN,
+                    contract_service_name,
+                    self._make_patch_handler(patch_type, is_contract=True, needs_crop=needs_crop),
+                    schema=patch_schema
+                )
         self.hass.services.async_register(
             DOMAIN, 
             "set_multi_entity_data", 
@@ -138,145 +160,30 @@ class RuneLiteFarmingServices:
             schema=SET_PATCH_DIRECTLY_SCHEMA,
         )
 
-        # Directly set patch types
-        self.hass.services.async_register(
-            DOMAIN, 
-            "herb_patch", 
-            self.async_herb_patch_service,
-            schema=SET_PATCH_DIRECTLY_SCHEMA,
-        )
-        self.hass.services.async_register(
-            DOMAIN, 
-            "tree_patch", 
-            self.async_tree_patch_service,
-            schema=SET_PATCH_WITH_CROP_SCHEMA,
-        )
-        self.hass.services.async_register(
-            DOMAIN, 
-            "fruit_tree_patch", 
-            self.async_fruit_tree_patch_service,
-            schema=SET_PATCH_DIRECTLY_SCHEMA,
-        )
-        self.hass.services.async_register(
-            DOMAIN, 
-            "bush_patch", 
-            self.async_bush_patch_service,
-            schema=SET_PATCH_WITH_CROP_SCHEMA,
-        )
-        self.hass.services.async_register(
-            DOMAIN, 
-            "hespori_patch", 
-            self.async_hespori_patch_service,
-            schema=SET_PATCH_DIRECTLY_SCHEMA,
-        )
-        self.hass.services.async_register(
-            DOMAIN, 
-            "hardwood_patch", 
-            self.async_hardwood_patch_service,
-            schema=SET_PATCH_WITH_CROP_SCHEMA,
-        )
-        self.hass.services.async_register(
-            DOMAIN, 
-            "allotment_patch", 
-            self.async_allotment_patch_service,
-            schema=SET_PATCH_WITH_CROP_SCHEMA,
-        )
-        self.hass.services.async_register(
-            DOMAIN, 
-            "flower_patch", 
-            self.async_flower_patch_service,
-            schema=SET_PATCH_DIRECTLY_SCHEMA,
-        )
-        self.hass.services.async_register(
-            DOMAIN, 
-            "cactus_patch", 
-            self.async_cactus_patch_service,
-            schema=SET_PATCH_DIRECTLY_SCHEMA,
-        )
-        self.hass.services.async_register(
-            DOMAIN, 
-            "potato_cactus_patch", 
-            self.async_potato_cactus_service,
-            schema=SET_PATCH_DIRECTLY_SCHEMA,
-        )
-        self.hass.services.async_register(
-            DOMAIN, 
-            "mushroom_patch", 
-            self.async_mushroom_patch_service,
-            schema=SET_PATCH_DIRECTLY_SCHEMA,
-        )
-        self.hass.services.async_register(
-            DOMAIN, 
-            "spirit_tree_patch", 
-            self.async_spirit_tree_patch_service,
-            schema=SET_PATCH_DIRECTLY_SCHEMA,
-        )
-        self.hass.services.async_register(
-            DOMAIN,
-            "redwood_patch",
-            self.async_redwood_patch_service,
-            schema=SET_PATCH_DIRECTLY_SCHEMA,
-        )
-
-        # Set Farming contract directly to patches
-        self.hass.services.async_register(
-            DOMAIN, 
-            "farming_contract_allotment", 
-            self.async_farming_contract_allotment_service,
-            schema=SET_PATCH_WITH_CROP_SCHEMA,
-        )
-        self.hass.services.async_register(
-            DOMAIN, 
-            "farming_contract_bush", 
-            self.async_farming_contract_bush_service,
-            schema=SET_PATCH_WITH_CROP_SCHEMA,
-        )
-        self.hass.services.async_register(
-            DOMAIN, 
-            "farming_contract_cactus", 
-            self.async_farming_contract_cactus_service,
-            schema=SET_PATCH_DIRECTLY_SCHEMA,
-        )
-        self.hass.services.async_register(
-            DOMAIN, 
-            "farming_contract_potato_cactus", 
-            self.async_farming_contract_potato_cactus_service,
-            schema=SET_PATCH_DIRECTLY_SCHEMA,
-        )
-        self.hass.services.async_register(
-            DOMAIN, 
-            "farming_contract_flower", 
-            self.async_farming_contract_flower_service,
-            schema=SET_PATCH_DIRECTLY_SCHEMA,
-        )
-        self.hass.services.async_register(
-            DOMAIN, 
-            "farming_contract_fruit_tree", 
-            self.async_farming_contract_fruit_tree_service,
-            schema=SET_PATCH_DIRECTLY_SCHEMA,
-        )
-        self.hass.services.async_register(
-            DOMAIN, 
-            "farming_contract_herb", 
-            self.async_farming_contract_herb_service,
-            schema=SET_PATCH_DIRECTLY_SCHEMA,
-        )
-        self.hass.services.async_register(
-            DOMAIN, 
-            "farming_contract_tree", 
-            self.async_farming_contract_tree_service,
-            schema=SET_PATCH_WITH_CROP_SCHEMA,
-        )
-        self.hass.services.async_register(
-            DOMAIN, 
-            "farming_contract_redwood", 
-            self.async_farming_contract_redwood_service,
-            schema=SET_PATCH_DIRECTLY_SCHEMA,
-        )
-
     def get_default_username(self) -> str:
         """Get the default username from the config entry."""
         return self.config_entry.data.get("username", "").replace(" ", "_").lower()
+    
+    def _make_patch_handler(self, patch_type, is_contract, needs_crop):
+        async def handler(service):
+            username = service.data.get("username") or self.get_default_username()
+            username = username.replace(" ", "_").lower()
+            entity_id = (
+                f"sensor.runelite_{username}_farming_contract"
+                if is_contract else
+                f"sensor.runelite_{username}_{patch_type}_patch"
+            )
+            crop_type = service.data.get("crop_type") if needs_crop else None
+            update_data = self.calculator.calculate(
+                patch_type=patch_type,
+                crop_type=crop_type,
+                status="in_progress"
+            )
+            if update_data is None:
+                _LOGGER.warning("Could not calculate patch for %s.", patch_type)
+                return
+            await self.async_update_entity_data(entity_id, update_data)
+        return handler
     
     async def async_update_entity_data(self, entity_id: str, data: dict) -> None:
         """Set data for a specific entity."""
@@ -345,9 +252,9 @@ class RuneLiteFarmingServices:
             username = service.data.get("username").replace(" ", "_").lower()
         else:
             username = self.get_default_username()
-        entity_id = f"sensor.runelite_{username}_{patch_type}_patch"
         crop_type = service.data.get("crop_type")
         patch_type = service.data.get("patch_type")
+        entity_id = f"sensor.runelite_{username}_{patch_type}_patch"
         update_data = self.calculator.calculate(crop_type, patch_type, "in_progress")
         if(update_data == None):
             _LOGGER.warning("Could not calculate farming contract.")
@@ -400,359 +307,6 @@ class RuneLiteFarmingServices:
             "completion_time": completion_time,
             "status": "in_progress",
         }
-        await self.async_update_entity_data(entity_id, update_data)
-
-    # Directly set patch types
-    ## These functions are used to set the patch types directly.
-    async def async_herb_patch_service(self, service: ServiceCall) -> None:
-        """Set the herb patch directly."""
-        username = None
-        if service.data.get("username"): 
-            username = service.data.get("username").replace(" ", "_").lower()
-        else:
-            username = self.get_default_username()
-        entity_id = f"sensor.runelite_{username}_herb_patch"
-        update_data = self.calculator.calculate(patch_type="herb", status="in_progress")
-        if(update_data == None):
-            _LOGGER.warning("Could not calculate farming contract.")
-            return
-        await self.async_update_entity_data(entity_id, update_data)
-    
-    async def async_tree_patch_service(self, service: ServiceCall) -> None:
-        """Set the tree patch directly."""
-        username = None
-        if service.data.get("username"): 
-            username = service.data.get("username").replace(" ", "_").lower()
-        else:
-            username = self.get_default_username()
-        
-        tree_patch = service.data.get("crop_type")
-
-        entity_id = f"sensor.runelite_{username}_tree_patch"
-        update_data = self.calculator.calculate(patch_type="tree", crop_type=tree_patch, status="in_progress")
-        if(update_data == None):
-            _LOGGER.warning("Could not calculate farming contract.")
-            return
-        await self.async_update_entity_data(entity_id, update_data)
-    
-    async def async_fruit_tree_patch_service(self, service: ServiceCall) -> None:
-        """Set the fruit tree patch directly."""
-        username = None
-        if service.data.get("username"): 
-            username = service.data.get("username").replace(" ", "_").lower()
-        else:
-            username = self.get_default_username()
-        
-
-        entity_id = f"sensor.runelite_{username}_fruit_tree_patch"
-        update_data = self.calculator.calculate(patch_type="fruit_tree", status="in_progress")
-        if(update_data == None):
-            _LOGGER.warning("Could not calculate farming contract.")
-            return
-        await self.async_update_entity_data(entity_id, update_data)
-    
-    async def async_bush_patch_service(self, service: ServiceCall) -> None:
-        """Set the nush patch directly."""
-        username = None
-        if service.data.get("username"): 
-            username = service.data.get("username").replace(" ", "_").lower()
-        else:
-            username = self.get_default_username()
-        
-        bush_patch = service.data.get("crop_type")
-
-        entity_id = f"sensor.runelite_{username}_bush_patch"
-        update_data = self.calculator.calculate(patch_type="bush", crop_type=bush_patch, status="in_progress")
-        if(update_data == None):
-            _LOGGER.warning("Could not calculate farming contract.")
-            return
-        await self.async_update_entity_data(entity_id, update_data)
-    
-    async def async_hespori_patch_service(self, service: ServiceCall) -> None:
-        """Set the hespori patch directly."""
-        username = None
-        if service.data.get("username"): 
-            username = service.data.get("username").replace(" ", "_").lower()
-        else:
-            username = self.get_default_username()
-        
-        entity_id = f"sensor.runelite_{username}_hespori_patch"
-        update_data = self.calculator.calculate(patch_type="hespori", status="in_progress")
-        if(update_data == None):
-            _LOGGER.warning("Could not calculate farming contract.")
-            return
-        await self.async_update_entity_data(entity_id, update_data)
-
-    async def async_hardwood_patch_service(self, service: ServiceCall) -> None:
-        """Set the hardwood patch directly."""
-        username = None
-        if service.data.get("username"): 
-            username = service.data.get("username").replace(" ", "_").lower()
-        else:
-            username = self.get_default_username()
-
-        hardwood_patch = service.data.get("crop_type")
-        
-        entity_id = f"sensor.runelite_{username}_hardwood_patch"
-        update_data = self.calculator.calculate(patch_type="hardwood", crop_type=hardwood_patch, status="in_progress")
-        if(update_data == None):
-            _LOGGER.warning("Could not calculate farming contract.")
-            return
-        await self.async_update_entity_data(entity_id, update_data)
-    
-    async def async_allotment_patch_service(self, service: ServiceCall) -> None:
-        """Set the allotment patch directly."""
-        username = None
-        if service.data.get("username"): 
-            username = service.data.get("username").replace(" ", "_").lower()
-        else:
-            username = self.get_default_username()
-
-        allotment_patch = service.data.get("crop_type")
-        
-        entity_id = f"sensor.runelite_{username}_allotment_patch"
-        update_data = self.calculator.calculate(patch_type="allotment", crop_type=allotment_patch, status="in_progress")
-        if(update_data == None):
-            _LOGGER.warning("Could not calculate farming contract.")
-            return
-        await self.async_update_entity_data(entity_id, update_data)
-
-    async def async_flower_patch_service(self, service: ServiceCall) -> None:
-        """Set the flower patch directly."""
-        username = None
-        if service.data.get("username"): 
-            username = service.data.get("username").replace(" ", "_").lower()
-        else:
-            username = self.get_default_username()
-
-        entity_id = f"sensor.runelite_{username}_flower_patch"
-        update_data = self.calculator.calculate(patch_type="flower", status="in_progress")
-        if(update_data == None):
-            _LOGGER.warning("Could not calculate farming contract.")
-            return
-        await self.async_update_entity_data(entity_id, update_data)
-    
-    async def async_cactus_patch_service(self, service: ServiceCall) -> None:
-        """Set the cactus patch directly."""
-        username = None
-        if service.data.get("username"): 
-            username = service.data.get("username").replace(" ", "_").lower()
-        else:
-            username = self.get_default_username()
-
-        entity_id = f"sensor.runelite_{username}_cactus_patch"
-        update_data = self.calculator.calculate(patch_type="cactus", status="in_progress")
-        if(update_data == None):
-            _LOGGER.warning("Could not calculate farming contract.")
-            return
-        await self.async_update_entity_data(entity_id, update_data)
-    
-    async def async_potato_cactus_service(self, service: ServiceCall) -> None:
-        """Set the potato cactus patch directly."""
-        username = None
-        if service.data.get("username"): 
-            username = service.data.get("username").replace(" ", "_").lower()
-        else:
-            username = self.get_default_username()
-
-        entity_id = f"sensor.runelite_{username}_potato_cactus_patch"
-        update_data = self.calculator.calculate(patch_type="potato_cactus", status="in_progress")
-        if(update_data == None):
-            _LOGGER.warning("Could not calculate farming contract.")
-            return
-        await self.async_update_entity_data(entity_id, update_data)
-    
-    async def async_mushroom_patch_service(self, service: ServiceCall) -> None:
-        """Set the mushroom patch directly."""
-        username = None
-        if service.data.get("username"): 
-            username = service.data.get("username").replace(" ", "_").lower()
-        else:
-            username = self.get_default_username()
-
-        entity_id = f"sensor.runelite_{username}_mushroom_patch"
-        update_data = self.calculator.calculate(patch_type="mushroom", status="in_progress")
-        if(update_data == None):
-            _LOGGER.warning("Could not calculate farming contract.")
-            return
-        await self.async_update_entity_data(entity_id, update_data)
-    
-    async def async_spirit_tree_patch_service(self, service: ServiceCall) -> None:
-        """Set the spirit tree patch directly."""
-        username = None
-        if service.data.get("username"): 
-            username = service.data.get("username").replace(" ", "_").lower()
-        else:
-            username = self.get_default_username()
-
-        entity_id = f"sensor.runelite_{username}_spirit_tree_patch"
-        update_data = self.calculator.calculate(patch_type="spirit_tree", status="in_progress")
-        if(update_data == None):
-            _LOGGER.warning("Could not calculate farming contract.")
-            return
-        await self.async_update_entity_data(entity_id, update_data)
-        
-    async def async_redwood_patch_service(self, service: ServiceCall) -> None:
-        """Set the redwood patch directly."""
-        username = None
-        if service.data.get("username"): 
-            username = service.data.get("username").replace(" ", "_").lower()
-        else:
-            username = self.get_default_username()
-
-        entity_id = f"sensor.runelite_{username}_redwood_patch"
-        update_data = self.calculator.calculate(patch_type="redwood", status="in_progress")
-        if(update_data == None):
-            _LOGGER.warning("Could not calculate farming contract.")
-            return
-        await self.async_update_entity_data(entity_id, update_data)
-    
-    ## Set Farming contract directly to patches
-    async def async_farming_contract_allotment_service(self, service: ServiceCall) -> None:
-        """Set the farming contract directly."""
-        username = None
-        if service.data.get("username"): 
-            username = service.data.get("username").replace(" ", "_").lower()
-        else:
-            username = self.get_default_username()
-
-        entity_id = f"sensor.runelite_{username}_farming_contract"
-        allotment_patch = service.data.get("crop_type")
-        update_data = self.calculator.calculate(patch_type="allotment", crop_type=allotment_patch, status="in_progress")
-
-        if(update_data == None):
-            _LOGGER.warning("Could not calculate farming contract.")
-            return
-        await self.async_update_entity_data(entity_id, update_data)
-
-    async def async_farming_contract_bush_service(self, service: ServiceCall) -> None:
-        """Set the farming contract directly."""
-        username = None
-        if service.data.get("username"): 
-            username = service.data.get("username").replace(" ", "_").lower()
-        else:
-            username = self.get_default_username()
-
-        entity_id = f"sensor.runelite_{username}_farming_contract"
-        bush_patch = service.data.get("crop_type")
-        update_data = self.calculator.calculate(patch_type="bush", crop_type=bush_patch, status="in_progress")
-
-        if(update_data == None):
-            _LOGGER.warning("Could not calculate farming contract.")
-            return
-        await self.async_update_entity_data(entity_id, update_data)
-
-    async def async_farming_contract_cactus_service(self, service: ServiceCall) -> None:
-        """Set the farming contract directly."""
-        username = None
-        if service.data.get("username"): 
-            username = service.data.get("username").replace(" ", "_").lower()
-        else:
-            username = self.get_default_username()
-
-        entity_id = f"sensor.runelite_{username}_farming_contract"
-        update_data = self.calculator.calculate(patch_type="cactus", status="in_progress")
-
-        if(update_data == None):
-            _LOGGER.warning("Could not calculate farming contract.")
-            return
-        await self.async_update_entity_data(entity_id, update_data)
-
-    async def async_farming_contract_potato_cactus_service(self, service: ServiceCall) -> None:
-        """Set the farming contract directly."""
-        username = None
-        if service.data.get("username"): 
-            username = service.data.get("username").replace(" ", "_").lower()
-        else:
-            username = self.get_default_username()
-
-        entity_id = f"sensor.runelite_{username}_farming_contract"
-        update_data = self.calculator.calculate(patch_type="potato_cactus", status="in_progress")
-
-        if(update_data == None):
-            _LOGGER.warning("Could not calculate farming contract.")
-            return
-        await self.async_update_entity_data(entity_id, update_data)
-
-    async def async_farming_contract_flower_service(self, service: ServiceCall) -> None:
-        """Set the farming contract directly."""
-        username = None
-        if service.data.get("username"): 
-            username = service.data.get("username").replace(" ", "_").lower()
-        else:
-            username = self.get_default_username()
-
-        entity_id = f"sensor.runelite_{username}_farming_contract"
-        flower_patch = service.data.get("crop_type")
-        update_data = self.calculator.calculate(patch_type="flower", crop_type=flower_patch, status="in_progress")
-
-        if(update_data == None):
-            _LOGGER.warning("Could not calculate farming contract.")
-            return
-        await self.async_update_entity_data(entity_id, update_data)
-    
-    async def async_farming_contract_fruit_tree_service(self, service: ServiceCall) -> None:
-        """Set the farming contract directly."""
-        username = None
-        if service.data.get("username"): 
-            username = service.data.get("username").replace(" ", "_").lower()
-        else:
-            username = self.get_default_username()
-
-        entity_id = f"sensor.runelite_{username}_farming_contract"
-        update_data = self.calculator.calculate(patch_type="fruit_tree", status="in_progress")
-
-        if(update_data == None):
-            _LOGGER.warning("Could not calculate farming contract.")
-            return
-        await self.async_update_entity_data(entity_id, update_data)
-    async def async_farming_contract_herb_service(self, service: ServiceCall) -> None:
-        """Set the farming contract directly."""
-        username = None
-        if service.data.get("username"): 
-            username = service.data.get("username").replace(" ", "_").lower()
-        else:
-            username = self.get_default_username()
-
-        entity_id = f"sensor.runelite_{username}_farming_contract"
-        update_data = self.calculator.calculate(patch_type="herb", status="in_progress")
-
-        if(update_data == None):
-            _LOGGER.warning("Could not calculate farming contract.")
-            return
-        await self.async_update_entity_data(entity_id, update_data)
-
-    async def async_farming_contract_tree_service(self, service: ServiceCall) -> None:
-        """Set the farming contract directly."""
-        username = None
-        if service.data.get("username"): 
-            username = service.data.get("username").replace(" ", "_").lower()
-        else:
-            username = self.get_default_username()
-
-        entity_id = f"sensor.runelite_{username}_farming_contract"
-        tree_patch = service.data.get("crop_type")
-        update_data = self.calculator.calculate(patch_type="tree", crop_type=tree_patch, status="in_progress")
-
-        if(update_data == None):
-            _LOGGER.warning("Could not calculate farming contract.")
-            return
-        await self.async_update_entity_data(entity_id, update_data)
-
-    async def async_farming_contract_redwood_service(self, service: ServiceCall) -> None:
-        """Set the farming contract directly."""
-        username = None
-        if service.data.get("username"): 
-            username = service.data.get("username").replace(" ", "_").lower()
-        else:
-            username = self.get_default_username()
-
-        entity_id = f"sensor.runelite_{username}_farming_contract"
-        update_data = self.calculator.calculate(patch_type="redwood", status="in_progress")
-
-        if(update_data == None):
-            _LOGGER.warning("Could not calculate farming contract.")
-            return
         await self.async_update_entity_data(entity_id, update_data)
 
 @callback
