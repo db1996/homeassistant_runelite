@@ -6,12 +6,13 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from .services import RuneLiteFarmingServices  # Import the service registration function
+from homeassistant.helpers import config_validation as cv
 
 from .const import DOMAIN
 
 DOMAIN = "runelite"
 PLATFORMS = [Platform.SENSOR]
-
+CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up RuneLite Farming from a config entry."""
