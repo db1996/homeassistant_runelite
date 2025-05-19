@@ -121,6 +121,19 @@ class RuneLiteFarmingServices:
                     self._make_patch_handler(patch_type, is_contract=True, needs_crop=needs_crop),
                     schema=patch_schema
                 )
+        
+        coordinator = self.hass.data[DOMAIN][self.config_entry.entry_id]["coordinator"]
+        if not coordinator or not coordinator.data:
+            _LOGGER.error("No data available from coordinator")
+            return
+        
+        self.hass.services.async_register(
+            DOMAIN,
+            "fetch_osrs_highscores",
+            self.async_refetch_osrs_highscores ,
+            schema=SET_PATCH_DIRECTLY_SCHEMA,
+        )
+        
         self.hass.services.async_register(
             DOMAIN, 
             "set_multi_entity_data", 
@@ -303,6 +316,26 @@ class RuneLiteFarmingServices:
             "status": "in_progress",
         }
         await self.async_update_entity_data(entity_id, update_data)
+
+    async def async_refetch_osrs_highscores(self, service: ServiceCall) -> None:
+        """Reset the birdhouses."""
+        username = None
+        if service.data.get("username"): 
+            username = service.data.get("username").replace(" ", "_").lower()
+        else:
+            username = self.get_default_username()
+
+        # get config entry based on username
+        config_entry = next(
+            (entry for entry in self.hass.config_entries.async_entries(DOMAIN) if entry.data.get("username") == username), None
+        )
+
+        coordinator = self.hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
+        if not coordinator or not coordinator.data:
+            _LOGGER.error("No data available from coordinator")
+            return
+        
+        await coordinator.async_request_refresh()
 
 @callback
 def async_register_services(hass: HomeAssistant, config_entry: ConfigEntry) -> None:

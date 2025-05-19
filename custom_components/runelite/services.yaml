@@ -528,3 +528,12 @@ farming_contract_redwood:
       description: The username of the player. If you only use one account, there is no need to fill this in
       selector:
         text:
+fetch_osrs_highscores:
+  name: Refetch OSRS Highscores
+  description: Refetch the OSRS highscores for the specified username.
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:

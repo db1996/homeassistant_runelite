@@ -8,8 +8,8 @@
   "dependencies": [],
   "documentation": "https://github.com/db1996/homeassistant_runelite",
   "integration_type": "hub",
-  "iot_class": "calculated",
+  "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/db1996/homeassistant_runelite/issues",
   "requirements": [],
-  "version": "2025.05.193"
+  "version": "2025.05.194"
 }

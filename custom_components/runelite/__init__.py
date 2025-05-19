@@ -7,6 +7,7 @@ from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from .services import RuneLiteFarmingServices  # Import the service registration function
 from homeassistant.helpers import config_validation as cv
+from .coordinator import OsrsHighscoresCoordinator
 
 from .const import DOMAIN
 
@@ -18,6 +19,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up RuneLite Farming from a config entry."""
     username = entry.data["username"]
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = {"username": username, "entities": {}} # Initialize entities
+
+    # Initialize and store the coordinator for the new sensor
+    coordinator = OsrsHighscoresCoordinator(hass, username)
+    await coordinator.async_config_entry_first_refresh()
+    hass.data[DOMAIN][entry.entry_id]["coordinator"] = coordinator
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     RuneLiteFarmingServices(hass, entry)  # Register the services
