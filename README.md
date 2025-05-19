@@ -56,7 +56,7 @@ services.py
 1. Ensure HACS is installed in your Home Assistant setup. If not, follow
    the [HACS installation guide](https://hacs.xyz/docs/setup/download).
 2. Open the HACS panel in Home Assistant.
-3. Click on custom repositories.
+3. Click on custom repositories (top right 3 vertical dots)
 4. Copy the github link in the repository field: https://github.com/db1996/homeassistant_runelite.
 5. Set the type field to: Integration
 6. Press the add button
