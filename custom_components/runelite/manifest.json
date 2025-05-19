@@ -1,13 +1,15 @@
 {
   "domain": "runelite",
   "name": "Runelite",
-  "codeowners": ["@db1996"],
+  "codeowners": [
+      "@db1996"
+  ],
+  "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/db1996/homeassistant_runelite",
-  "issue_tracker": "https://github.com/db1996/homeassistant_runelite/issues",
   "integration_type": "hub",
   "iot_class": "calculated",
-  "version": "2025.05.193",
-  "config_flow": true,
-  "requirements": []
+  "issue_tracker": "https://github.com/db1996/homeassistant_runelite/issues",
+  "requirements": [],
+  "version": "2025.05.193"
 }
