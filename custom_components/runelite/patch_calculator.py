@@ -64,7 +64,7 @@ class PatchCalculator:
         self.start_time = datetime.now(timezone.utc)
         crop_patch_type = None
         growth_cycles = None
-        _LOGGER.info(
+        _LOGGER.debug(
             f"Calculating completion time for crop type '{crop_type}' or patch type '{patch_type}'."
         )
         if crop_type:
@@ -94,6 +94,9 @@ class PatchCalculator:
         cycle_length_minutes = patch_info.get("cycle_length_minutes")
         growth_ticks = patch_info.get("growth_ticks")
         growth_ticks_days = patch_info.get("growth_ticks_days")
+        _LOGGER.debug(
+            f"Patch type '{crop_patch_type}' has cycle length of {cycle_length_minutes} minutes."
+        )
 
         if cycle_length_minutes is None:
             _LOGGER.error(f"Could not find 'cycle_length_minutes' for patch type '{crop_patch_type}'.")
@@ -135,12 +138,15 @@ class PatchCalculator:
                         remaining_cycles = total_cycles - 1
                         completion_delay = timedelta(minutes=remaining_cycles * cycle_length_minutes)
                         next_completion_time_utc = target_time_utc_offset + completion_delay
-                        _LOGGER.info(
+                        _LOGGER.debug(
                             f"Next growth tick found at {target_time_utc_offset.strftime('%H:%M:%S UTC')} for '{crop_patch_type}'. Remaining cycles: {remaining_cycles}"
                         )
                         return {"crop_patch_type": crop_patch_type, "completion_time": next_completion_time_utc}
 
             # Fallback if no future tick found in the loop (should be rare)
+            _LOGGER.warning(
+                f"No future growth tick found for '{crop_patch_type}'. Falling back to cycle length."
+            )
             first_tick_str = growth_ticks[0]
             tick_hour_str, tick_minute_str = first_tick_str.split(":")
             target_minute = int(tick_minute_str)
@@ -159,7 +165,7 @@ class PatchCalculator:
             return {"crop_patch_type": crop_patch_type, "completion_time": next_completion_time_utc}
 
         elif growth_ticks_days:
-            _LOGGER.info(f"Calculating completion time based on daily growth ticks for '{crop_patch_type}'.")
+            _LOGGER.debug(f"Calculating completion time based on daily growth ticks for '{crop_patch_type}'.")
             start_date = datetime(2025, 4, 6, tzinfo=timezone.utc)  # Sunday, April 6, 2025
             self.start_time = datetime.now(timezone.utc)
             elapsed_days = (self.start_time.date() - start_date.date()).days
@@ -178,7 +184,7 @@ class PatchCalculator:
                 return None  # Or handle as needed
 
             current_growth_day = (elapsed_days % days_in_cycle) + 1
-            _LOGGER.info(
+            _LOGGER.debug(
                 f"Current elapsed days: {elapsed_days}, Days in cycle: {days_in_cycle}, Current growth day: {current_growth_day}"
             )
 
@@ -248,7 +254,7 @@ class PatchCalculator:
                                 next_completion_time_utc = target_time_utc_offset + timedelta(
                                     minutes=(growth_cycles - 1) * cycle_length_minutes
                                 )
-                                _LOGGER.info(
+                                _LOGGER.debug(
                                     f"Next growth tick found on day {next_growth_day} ({future_date.strftime('%Y-%m-%d')}) at {target_time_utc_offset.strftime('%H:%M:%S UTC')}"
                                 )
                                 return {"crop_patch_type": crop_patch_type, "completion_time": next_completion_time_utc}

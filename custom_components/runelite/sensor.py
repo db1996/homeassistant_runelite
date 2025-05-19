@@ -26,13 +26,13 @@ async def async_setup_entry(
     username = hass.data[DOMAIN][config_entry.entry_id]["username"]
 
     usernameFixed = username.replace(" ", "_").lower()
-    _LOGGER.info('Setting up sensors for %s', username)
+    _LOGGER.debug('Setting up sensors for %s', username)
     entities = []
     for patch_type, patch_data in PATCH_TYPE_DATA.items():
         # sanitize the patch type for unique_id
         patch_type = patch_type.replace(" ", "_").lower()
         unique_id = f"runelite_{usernameFixed.lower()}_{patch_type.lower()}_patch"
-        _LOGGER.info('Setting up sensors for %s %s', usernameFixed, unique_id)
+        _LOGGER.debug('Setting up sensors for %s %s', usernameFixed, unique_id)
 
         entity = FarmingPatchTypeSensor(username, patch_type, unique_id, patch_data)
         entities.append(entity)
@@ -51,7 +51,7 @@ async def async_setup_entry(
     entities.append(farming_tick_entity)
 
     async_add_entities(entities)
-    _LOGGER.info('Added %d sensors for %s', len(entities), username)
+    _LOGGER.debug('Added %d sensors for %s', len(entities), username)
 
     if "entities" not in hass.data[DOMAIN][config_entry.entry_id]:
         hass.data[DOMAIN][config_entry.entry_id]["entities"] = {}

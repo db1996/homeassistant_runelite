@@ -187,15 +187,12 @@ class RuneLiteFarmingServices:
     
     async def async_update_entity_data(self, entity_id: str, data: dict) -> None:
         """Set data for a specific entity."""
+        _LOGGER.debug(f"trying to find entity '{entity_id}' with data: {data}")
         integration_data = self.hass.data.get(DOMAIN, {})
         for entry_id, entry_data in integration_data.items():
             sensor_entity = entry_data.get("entities", {}).get(entity_id)
-            _LOGGER.info(f"trying to find entity '{entity_id}' with data: {data}")
-            _LOGGER.info(f"sensor_entity: {sensor_entity}")
-            # log the instance type
-            _LOGGER.info(f"sensor_entity type: {type(sensor_entity)}")
             if isinstance(sensor_entity, (FarmingPatchTypeSensor, FarmingContractSensor, FarmingTickOffsetSensor, BirdhousesSensor)):
-                _LOGGER.info(f"Updating entity '{entity_id}' with data: {data}")
+                _LOGGER.debug(f"Updating entity '{entity_id}' with data: {data}")
                 await sensor_entity.update_data(data)
                 return
         _LOGGER.warning(f"Entity '{entity_id}' not found in the integration data.")
@@ -203,7 +200,7 @@ class RuneLiteFarmingServices:
     async def async_set_multi_entity_data_service(self, service: ServiceCall) -> None:
         """Set data for multiple farming patch entities in one call."""
         entities_data = service.data.get("entities", [])
-        _LOGGER.info(f"Setting data for multiple entities: {entities_data}")
+        _LOGGER.debug(f"Setting data for multiple entities: {entities_data}")
         
         for entity_data in entities_data:
             entity_id = entity_data.get("entity_id")
@@ -256,7 +253,7 @@ class RuneLiteFarmingServices:
         patch_type = service.data.get("patch_type")
         entity_id = f"sensor.runelite_{username}_{patch_type}_patch"
         update_data = self.calculator.calculate(crop_type, patch_type, "in_progress")
-        if(update_data == None):
+        if(update_data is None):
             _LOGGER.warning("Could not calculate farming contract.")
             return
         await self.async_update_entity_data(entity_id, update_data)
@@ -273,7 +270,7 @@ class RuneLiteFarmingServices:
         crop_type = service.data.get("crop_type")
         patch_type = service.data.get("patch_type")
         update_data = self.calculator.calculate(crop_type, patch_type, "in_progress")
-        if(update_data == None):
+        if(update_data is None):
             _LOGGER.warning("Could not calculate farming contract.")
             return
         await self.async_update_entity_data(entity_id, update_data)
@@ -286,8 +283,6 @@ class RuneLiteFarmingServices:
         else:
             username = self.get_default_username()
         entity_id = f"sensor.runelite_{username}_farming_tick_offset"
-        _LOGGER.info(f"Setting farming tick offset for '{username}' to." )
-        _LOGGER.info(f"Service data: {service.data}")
         update_data = {
             "farming_tick_offset": service.data.get("farming_tick_offset")
         }
