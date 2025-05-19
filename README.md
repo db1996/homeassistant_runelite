@@ -9,8 +9,8 @@ Custom HACS integration for tracking farming patches, farming contracts and bird
 
 - [Runelite OSRS](#runelite-osrs)
   - [Installation](#installation)
+    - [Via HACS](#via-hacs)
     - [Manual Installation](#manual-installation)
-    - [Installation via HACS](#installation-via-hacs)
   - [Configuration](#configuration)
     - [Add Integration](#add-integration)
     - [Accompanying runelite plugin](#accompanying-runelite-plugin)
@@ -28,6 +28,18 @@ Custom HACS integration for tracking farming patches, farming contracts and bird
 
 
 ## Installation
+
+### Via HACS
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=db1996&repository=homeassistant_runelite&category=integration)
+
+1. In Home Assistant, open **HACS** in the sidebar.
+2. Click the **⋮** menu (top right) and select **Custom repositories**.
+3. Add this repository:
+   - **URL**: `https://github.com/db1996/homeassistant_runelite`
+   - **Category**: **Integration**
+4. Back in **HACS → Integrations**, locate **Backup to Dropbox** and click **Install**.
+5. After installation, go to **Settings → System → Integrations**, click **+ Add integration**, then search for **runelite**.
 
 ### Manual Installation
 
@@ -51,17 +63,6 @@ services.py
 ...
 ```
 
-### Installation via HACS 
-
-1. Ensure HACS is installed in your Home Assistant setup. If not, follow
-   the [HACS installation guide](https://hacs.xyz/docs/setup/download).
-2. Open the HACS panel in Home Assistant.
-3. Click on custom repositories.
-4. Copy the github link in the repository field: https://github.com/db1996/homeassistant_runelite.
-5. Set the type field to: Integration
-6. Press the add button
-7. Restart Home Assistant after the installation completes.
-
 <!-- TODO
 ### Installation via HACS 
 
@@ -72,8 +73,6 @@ services.py
 4. Click the `+` button and search for `runelite`.
 5. Click `Install` to add the component to your Home Assistant setup.
 6. Restart Home Assistant after the installation completes. -->
-
----
 
 ## Configuration
 
