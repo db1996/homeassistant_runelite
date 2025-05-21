@@ -6,27 +6,6 @@
 <br><br>
 Custom HACS integration for tracking farming patches, farming contracts and birdhouse timers. 
 
-
-- [Runelite OSRS](#runelite-osrs)
-  - [Installation](#installation)
-    - [Via HACS](#via-hacs)
-    - [Manual Installation](#manual-installation)
-  - [Configuration](#configuration)
-    - [Add Integration](#add-integration)
-    - [Accompanying runelite plugin](#accompanying-runelite-plugin)
-  - [Entities](#entities)
-  - [Services (actions)](#services-actions)
-    - [set\_farming\_tick\_offset](#set_farming_tick_offset)
-    - [reset\_birdhouses](#reset_birdhouses)
-    - [calculate\_patch\_or\_crop](#calculate_patch_or_crop)
-    - [calculate\_farming\_contract](#calculate_farming_contract)
-    - [Shortcut services](#shortcut-services)
-    - [Patches](#patches)
-    - [Farming contracts](#farming-contracts)
-  - [Dashboard overview example](#dashboard-overview-example)
-  - [Dashboard calculate patches and farming contract buttons](#dashboard-calculate-patches-and-farming-contract-buttons)
-
-
 ## Installation
 
 ### Via HACS
