@@ -37,11 +37,17 @@ async def async_setup_entry(
     # Example: create a sensor for each skill in the hiscore data
     if coordinator.data:
         for skill in coordinator.data.get("skills", []):
+            skill_name = skill.get('name').lower()
+            if skill_name in ["overall"]:
+                skill_name = "total"  # Normalize the name for the total skill
+
+            skill['name'] = skill_name.capitalize()  # Capitalize the skill name for display
+                
             skill_entity = OsrsSkillSensor(
                 coordinator,
                 username,
                 skill,
-                f"runelite_{username.lower()}_{skill.get('name').lower()}_skill",
+                f"runelite_{username.lower()}_skill_{skill_name}",
             )
             entities.append(skill_entity)
 

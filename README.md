@@ -4,7 +4,7 @@
 [![Open Source Love png1](https://badges.frapsoft.com/os/v1/open-source.png?v=103)](https://github.com/ellerbrock/open-source-badges/)
 
 <br><br>
-Custom HACS integration for tracking farming patches, farming contracts and birdhouse timers. 
+Custom HACS integration for tracking farming patches, farming contracts and birdhouse timers. It also tracks skill and total XP over time.
 
 ## Installation
 
@@ -78,13 +78,16 @@ Repository: https://github.com/db1996/homeassistant
 
 ## Entities
 
-These entites are created with the following attributes
+### Farming / Birdhouses
+
+These entities are the main feature of this integration. It tracks status and completion times from various farming patches, farming contract patches, and birdhouses.
 
 |**Entity ID**|
 |----|
 |sensor.runelite_%username_farming_contract
 |sensor.runelite_%username_birdhouses
 |sensor.runelite_%username_farming_tick_offset
+|sensor.runelite_%username_seaweed_patch
 |sensor.runelite_%username_herb_patch
 |sensor.runelite_%username_tree_patch
 |sensor.runelite_%username_fruit_tree_patch
@@ -107,7 +110,22 @@ Except for the farming tick offset, which is just a number from -30 to 30, all o
 `crop_type` not always set, the only patch type with varying growth times are: tree, hardwood tree, allotment, bush. So only the available seeds are an input for those. that includes the farming contract.<br>
 `patch_type` This is set for all the patch entities. For the farming contract it is always needed. For the other patches it is an attribute only for ease of use in creating a dashboard.
 
----
+### Skills 
+
+Every skill has it's own sensor to track XP/level over time. There is also one for total XP. Can be used for cool graphs. 
+
+The ID of the entity will be `sensor.runelite_%username_skill_%skilname`
+
+The state of the sensor is the XP.
+IT has the following _attributes: 
+`ID` Is the OSRS skill ID <br>
+`Name` Friendly name of the skill<br>
+
+`Rank` Rank on the highscores<br>
+`Level` Currrent level<br>
+`Xp` Current XP
+
+The skills automatically update every 6 hours from the OSRS highscores. There is a service to refetch.
 
 ## Services (actions)
 

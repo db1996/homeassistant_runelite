@@ -1,7 +1,6 @@
 from datetime import timedelta
 import aiohttp
 from homeassistant.helpers.update_coordinator import (
-    CoordinatorEntity,
     DataUpdateCoordinator,
     UpdateFailed,
 )
@@ -17,7 +16,7 @@ class OsrsHighscoresCoordinator(DataUpdateCoordinator):
             hass,
             _LOGGER,
             name=f"OSRS Highscores Coordinator ({username})",
-            update_interval=timedelta(hours=1),
+            update_interval=timedelta(hours=6),
         )
 
     async def _async_update_data(self):
