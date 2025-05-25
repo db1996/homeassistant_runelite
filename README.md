@@ -70,9 +70,10 @@ After completing the config flow, the integration will automatically create sens
 
 ### Accompanying runelite plugin
 
-I have built a custom runelite plugin to automatically update these entities. It will also automatically set the correct farming tick offset. I am going through the process of getting it in the plugin hub right now.
+I have built a custom runelite plugin to automatically update these entities. It will also automatically set the correct farming tick offset.
 
-Repository: https://github.com/db1996/homeassistant
+It can be found on the plugin hub named "Homeassistant", or check the repository:
+https://github.com/db1996/homeassistant
 
 ---
 
