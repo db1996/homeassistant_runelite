@@ -11,7 +11,7 @@ class OsrsSkillSensor(SensorEntity, RestoreEntity):
         self._username = username
         self._skill_data = skill_data
         self._unique_id = unique_id
-        self._attr_name = f"OSRS {username} {skill_data['name'].capitalize()}"
+        self._attr_name = f"Runelite {username} Skill {skill_data['name'].capitalize()}"
         self._attr_unique_id = unique_id
 
     @property
