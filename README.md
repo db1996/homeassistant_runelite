@@ -17,7 +17,7 @@ Custom HACS integration for tracking farming patches, farming contracts and bird
 3. Add this repository:
    - **URL**: `https://github.com/db1996/homeassistant_runelite`
    - **Category**: **Integration**
-4. Back in **HACS → Integrations**, locate **Backup to Dropbox** and click **Install**.
+4. Back in **HACS → Integrations**, locate **runelite** and click **Install**.
 5. After installation, go to **Settings → System → Integrations**, click **+ Add integration**, then search for **runelite**.
 
 ### Manual Installation
