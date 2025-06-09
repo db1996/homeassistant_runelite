@@ -10,6 +10,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from .const import PATCH_TYPE_DATA
 from .sensors.osrs_skill import OsrsSkillSensor
+from .sensors.osrs_activity import OsrsActivitySensor
 from .sensors.farming_patch import FarmingPatchTypeSensor
 from .sensors.contract import FarmingContractSensor
 from .sensors.birdhouses import BirdhousesSensor
@@ -50,6 +51,17 @@ async def async_setup_entry(
                 f"runelite_{username.lower()}_skill_{skill_name}",
             )
             entities.append(skill_entity)
+        for activity in coordinator.data.get("activities", []):
+            activity_name = activity.get('name').lower()
+            activity['name'] = activity_name.capitalize()  # Capitalize the activity name for display
+            activity_entity = OsrsActivitySensor(
+                coordinator,
+                username,
+                activity,
+                f"runelite_{username.lower()}_activity_{activity_name}",
+            )
+            _LOGGER.debug('Adding activity sensor for %s: %s', username, activity_name)
+            entities.append(activity_entity)
 
     async_add_entities(entities)
 
