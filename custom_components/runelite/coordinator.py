@@ -20,6 +20,8 @@ class OsrsHighscoresCoordinator(DataUpdateCoordinator):
         )
 
     async def _async_update_data(self):
+        """Fetch data from the OSRS hiscores API."""
+        _LOGGER.debug("Fetching OSRS hiscores for user: %s", self.username)
         url = f"https://secure.runescape.com/m=hiscore_oldschool/index_lite.json?player={self.username}"
         try:
             async with aiohttp.ClientSession() as session:

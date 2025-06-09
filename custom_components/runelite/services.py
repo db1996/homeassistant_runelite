@@ -325,10 +325,18 @@ class RuneLiteFarmingServices:
         else:
             username = self.get_default_username()
 
+        if not username:
+            _LOGGER.error("Username is required to fetch OSRS highscores.")
+            return
+        
         # get config entry based on username
-        config_entry = next(
-            (entry for entry in self.hass.config_entries.async_entries(DOMAIN) if entry.data.get("username") == username), None
-        )
+        config_entry = self.hass.config_entries.async_entries(DOMAIN)
+        config_entry = next((entry for entry in config_entry if entry.data.get("username", "") == username), None)
+        _LOGGER.debug("Config entry found: %s", config_entry)
+
+        if not config_entry:
+            _LOGGER.error("No config entry found for username: %s", username)
+            return
 
         coordinator = self.hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
         if not coordinator or not coordinator.data:
