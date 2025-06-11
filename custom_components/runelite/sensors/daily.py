@@ -12,6 +12,7 @@ class DailySensor(SensorEntity, RestoreEntity):
         self._unique_id = unique_id
         self._attr_name = f"Runelite {username} Daily {name.capitalize()}"
         self._attr_unique_id = unique_id
+        self._attr_unit_of_measurement = "Done"
 
     @property
     def state(self):

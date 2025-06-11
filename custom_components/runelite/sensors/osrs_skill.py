@@ -13,6 +13,8 @@ class OsrsSkillSensor(SensorEntity, RestoreEntity):
         self._unique_id = unique_id
         self._attr_name = f"Runelite {username} Skill {skill_data['name'].capitalize()}"
         self._attr_unique_id = unique_id
+        self._attr_unit_of_measurement = "XP"
+        self._attr_state_class = "total_increasing"
 
     @property
     def state(self):
