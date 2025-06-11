@@ -5,9 +5,9 @@ from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import config_validation as cv
-from .sensor import FarmingPatchTypeSensor, FarmingContractSensor, FarmingTickOffsetSensor, BirdhousesSensor  # Import your sensor class if needed
+from .sensor import FarmingPatchTypeSensor, FarmingContractSensor, FarmingTickOffsetSensor, BirdhousesSensor, DailySensor, OsrsActivitySensor, OsrsSkillSensor, CompostBinSensor  # Import your sensor class if needed
 from datetime import datetime, timedelta, timezone
-from .const import DOMAIN, PATCH_TYPE_DATA, CROP_TYPE_DATA  # Import constants
+from .const import DOMAIN, PATCH_TYPE_DATA, CROP_TYPE_DATA, DAILY_SENSORS  # Import constants
 from .patch_calculator import PatchCalculator  # Import your calculator function
 
 import voluptuous as vol
@@ -25,6 +25,10 @@ SET_ENTITY_DATA_SCHEMA = vol.Schema(
         vol.Optional("status"): cv.string,
         vol.Optional("crop_type"): cv.string,
         vol.Optional("patch_type"): cv.string,
+        vol.Optional("state"): vol.All(int, vol.Range(min=-1, max=1)),
+        vol.Optional("farming_tick_offset"): vol.All(
+            int, vol.Range(min=-30, max=30)
+        ),
     }
 )
 
@@ -36,9 +40,14 @@ SET_MULTI_ENTITY_DATA_SCHEMA = vol.Schema(
                     {
                         vol.Required("entity_id"): cv.entity_id,
                         vol.Optional("completion_time"): cv.datetime,
+                        vol.Optional("username"): cv.string,
                         vol.Optional("status"): cv.string,
                         vol.Optional("crop_type"): cv.string,
                         vol.Optional("patch_type"): cv.string,
+                        vol.Optional("state"): vol.All(int, vol.Range(min=-1, max=1)),
+                        vol.Optional("farming_tick_offset"): vol.All(
+                            int, vol.Range(min=-30, max=30)
+                        ),
                     }
                 )
             ]
@@ -122,6 +131,21 @@ class RuneLiteFarmingServices:
                     schema=patch_schema
                 )
         
+        for daily_sensor in DAILY_SENSORS:
+            _LOGGER.debug(f"Registering daily service: {daily_sensor}")
+            self.hass.services.async_register(
+                DOMAIN,
+                f"daily_reset_{daily_sensor}",
+                self._make_daily_handler(daily_sensor, state=0),
+                schema=SET_PATCH_DIRECTLY_SCHEMA
+            )
+            self.hass.services.async_register(
+                DOMAIN,
+                f"daily_done_{daily_sensor}",
+                self._make_daily_handler(daily_sensor, state=1),
+                schema=SET_PATCH_DIRECTLY_SCHEMA
+            )
+        
         coordinator = self.hass.data[DOMAIN][self.config_entry.entry_id]["coordinator"]
         if not coordinator or not coordinator.data:
             _LOGGER.error("No data available from coordinator")
@@ -173,6 +197,20 @@ class RuneLiteFarmingServices:
             schema=SET_PATCH_DIRECTLY_SCHEMA,
         )
 
+        self.hass.services.async_register(
+            DOMAIN, 
+            "reset_big_compost",
+            self.async_reset_big_compost_services, 
+            schema=SET_PATCH_DIRECTLY_SCHEMA,
+        )
+
+        self.hass.services.async_register(
+            DOMAIN, 
+            "reset_all_dailies",
+            self.async_reset_all_dailies_services, 
+            schema=SET_PATCH_DIRECTLY_SCHEMA,
+        )
+
     def get_default_username(self) -> str:
         """Get the default username from the config entry."""
         return self.config_entry.data.get("username", "").replace(" ", "_").lower()
@@ -198,13 +236,27 @@ class RuneLiteFarmingServices:
             await self.async_update_entity_data(entity_id, update_data)
         return handler
     
+    def _make_daily_handler(self, daily_sensor, state):
+        async def handler(service):
+            username = service.data.get("username") or self.get_default_username()
+            username = username.replace(" ", "_").lower()
+            entity_id = f"sensor.runelite_{username}_daily_{daily_sensor}"
+            _LOGGER.debug(f"Resetting daily sensor '{entity_id}' for {username}.")
+
+            update_data = {
+                "state": state,
+            }
+
+            await self.async_update_entity_data(entity_id, update_data)
+        return handler
+    
     async def async_update_entity_data(self, entity_id: str, data: dict) -> None:
         """Set data for a specific entity."""
-        _LOGGER.debug(f"trying to find entity '{entity_id}' with data: {data}")
         integration_data = self.hass.data.get(DOMAIN, {})
         for entry_id, entry_data in integration_data.items():
             sensor_entity = entry_data.get("entities", {}).get(entity_id)
-            if isinstance(sensor_entity, (FarmingPatchTypeSensor, FarmingContractSensor, FarmingTickOffsetSensor, BirdhousesSensor)):
+            # get instance of the sensor entity
+            if isinstance(sensor_entity, (FarmingPatchTypeSensor, FarmingContractSensor, FarmingTickOffsetSensor, BirdhousesSensor, DailySensor, OsrsActivitySensor, OsrsSkillSensor, CompostBinSensor)):
                 _LOGGER.debug(f"Updating entity '{entity_id}' with data: {data}")
                 await sensor_entity.update_data(data)
                 return
@@ -230,6 +282,10 @@ class RuneLiteFarmingServices:
                 update_data["crop_type"] = entity_data["crop_type"]
             if "patch_type" in entity_data:
                 update_data["patch_type"] = entity_data["patch_type"]
+            if "state" in entity_data:
+                update_data["state"] = entity_data["state"]
+            if "farming_tick_offset" in entity_data:
+                update_data["farming_tick_offset"] = entity_data["farming_tick_offset"]
 
             await self.async_update_entity_data(entity_id, update_data)
         return
@@ -241,6 +297,8 @@ class RuneLiteFarmingServices:
         status = service.data.get("status")
         crop_type = service.data.get("crop_type")
         patch_type = service.data.get("patch_type")
+        state = service.data.get("state")
+        farming_tick_offset = service.data.get("farming_tick_offset")
         
         update_data = {}
         if completion_time:
@@ -251,6 +309,10 @@ class RuneLiteFarmingServices:
             update_data["crop_type"] = crop_type
         if patch_type:
             update_data["patch_type"] = patch_type
+        if state is not None:
+            update_data["state"] = state
+        if farming_tick_offset is not None:
+            update_data["farming_tick_offset"] = farming_tick_offset
 
         await self.async_update_entity_data(entity_id, update_data)
         return
@@ -316,6 +378,51 @@ class RuneLiteFarmingServices:
             "status": "in_progress",
         }
         await self.async_update_entity_data(entity_id, update_data)
+
+    async def async_reset_big_compost_services(self, service: ServiceCall) -> None:
+        """Reset the big compost."""
+        username = None
+        if service.data.get("username"): 
+            username = service.data.get("username").replace(" ", "_").lower()
+        else:
+            username = self.get_default_username()
+
+        entity_id = f"sensor.runelite_{username}_big_compost"
+        completion_time = datetime.now(timezone.utc) + timedelta(minutes=90)
+        update_data = {
+            "completion_time": completion_time,
+            "status": "in_progress",
+        }
+        await self.async_update_entity_data(entity_id, update_data)\
+        
+    async def async_reset_all_dailies_services(self, service: ServiceCall) -> None:
+        """Reset all daily tasks."""
+        username = None
+        if service.data.get("username"): 
+            username = service.data.get("username").replace(" ", "_").lower()
+        else:
+            username = self.get_default_username()
+
+        integration_data = self.hass.data.get(DOMAIN, {})
+        for entry_id, entry_data in integration_data.items():
+            entities = entry_data.get("entities", {})
+            for daily_sensor in DAILY_SENSORS:
+                # sanitize the daily sensor name for unique_id
+                entity_id = f"runelite_{username.lower()}_daily_{daily_sensor}"
+
+                #  find the entity in the integration data
+                sensor_entity = entities.get(entity_id)
+                if isinstance(sensor_entity, DailySensor):
+                    _LOGGER.debug(f"Resetting daily sensor '{entity_id}' for {username}.")
+                    # Reset the daily sensor
+                    update_data = {
+                        "state": 0,
+                    }
+                    await sensor_entity.update_data(update_data)
+                else:
+                    _LOGGER.warning(f"Daily sensor '{entity_id}' not found for {username}.")
+
+                
 
     async def async_refetch_osrs_highscores(self, service: ServiceCall) -> None:
         """Reset the birdhouses."""

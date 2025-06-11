@@ -13,6 +13,8 @@ set_multi_entity_data:
           status: in_progress
           crop_type: ranarr
           patch_type: herb
+          farming_tick_offset: -25
+          state: 1
         - entity_id: sensor.runelite_username_tree_patch
           status: ready
 
@@ -95,6 +97,25 @@ set_entity_data:
             - dead
             - harvested
             - not_planted
+    farming_tick_offset:
+      required: false
+      name: Farming Tick Offset
+      description: The farming tick offset for the patch. This is used to adjust the completion time.
+      selector:
+        number:
+          min: -30
+          max: 30
+          step: 1
+    state:
+      required: false
+      name: State
+      description: The state of a daily task (0 for not done, 1 for done, -1 for no requirements met).
+      selector:
+        select:
+          options:
+            - -1
+            - 0
+            - 1
 
 calculate_patch_or_crop:
   name: Calculate Patch or Crop
@@ -231,6 +252,16 @@ set_farming_tick_offset:
 reset_birdhouses:
   name: Reset Birdhouses
   description: Resets the birdhouse timers
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+
+reset_big_compost:
+  name: Reset Big Compost
+  description: Resets the big compost timers
   fields:
     username:
       name: Username
@@ -537,3 +568,154 @@ fetch_osrs_highscores:
       description: The username of the player. If you only use one account, there is no need to fill this in
       selector:
         text:
+
+reset_all_dailies:
+  name: Reset All Dailies
+  description: Resets all daily tasks for the specified username.
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+
+daily_reset_herb_boxes:
+  name: Reset Herb Boxes
+  description: Resets the herb boxes for the specified username.
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+
+daily_done_herb_boxes:
+  name: Daily Done Herb Boxes
+  description: Marks the herb boxes as done for the specified username.
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+
+daily_reset_staves:
+  name: Reset Staves
+  description: Resets the staves for the specified username.
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+
+daily_done_staves:
+  name: Daily Done Staves
+  description: Marks the staves as done for the specified username.
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+
+daily_reset_essence:
+  name: Reset Essence
+  description: Resets the essence for the specified username.
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+
+daily_done_essence:
+  name: Daily Done Essence
+  description: Marks the essence as done for the specified username.
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+
+daily_reset_sand:
+  name: Reset Sand
+  description: Resets the sand for the specified username.
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+
+daily_done_sand:
+  name: Daily Done Sand
+  description: Marks the sand as done for the specified username.
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+
+daily_reset_flax:
+  name: Reset Flax
+  description: Resets the flax for the specified username.
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+
+daily_done_flax:
+  name: Daily Done Flax
+  description: Marks the flax as done for the specified username.
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+
+daily_reset_arrows:
+  name: Reset Arrows
+  description: Resets the arrows for the specified username.
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+
+daily_done_arrows:
+  name: Daily Done Arrows
+  description: Marks the arrows as done for the specified username.
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+
+daily_reset_dynamite:
+  name: Reset Dynamite
+  description: Resets the dynamite for the specified username.
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+
+daily_done_dynamite:
+  name: Daily Done Dynamite
+  description: Marks the dynamite as done for the specified username.
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+

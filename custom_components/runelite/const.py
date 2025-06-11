@@ -243,3 +243,13 @@ CROP_TYPE_DATA = {
     "whiteberry": {"patch_type": "bush", "cycles": 8},
     "poison_ivy": {"patch_type": "bush", "cycles": 8},
 }
+
+DAILY_SENSORS = [
+    "herb_boxes",
+    "staves",
+    "essence",
+    "sand",
+    "flax",
+    "arrows",
+    "dynamite"
+]
