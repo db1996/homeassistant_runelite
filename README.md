@@ -4,7 +4,8 @@
 [![Open Source Love png1](https://badges.frapsoft.com/os/v1/open-source.png?v=103)](https://github.com/ellerbrock/open-source-badges/)
 
 <br><br>
-Custom HACS integration for tracking farming patches, farming contracts and birdhouse timers. It also tracks skill and total XP over time.
+Custom HACS integration for tracking farming patches, farming contracts and birdhouse timers. It also tracks skill XP, total XP and boss KC's over time. 
+It also supports dailies like battlestaves, sand etc.
 
 ## Installation
 
@@ -118,7 +119,7 @@ Every skill has it's own sensor to track XP/level over time. There is also one f
 The ID of the entity will be `sensor.runelite_%username_skill_%skilname`
 
 The state of the sensor is the XP.
-IT has the following _attributes: 
+It has the following _attributes: 
 `ID` Is the OSRS skill ID <br>
 `Name` Friendly name of the skill<br>
 
@@ -127,6 +128,37 @@ IT has the following _attributes:
 `Xp` Current XP
 
 The skills automatically update every 6 hours from the OSRS highscores. There is a service to refetch.
+
+### Activities
+
+All activities found on the OSRS highscores have their own sensors, 
+
+The ID of the entity will be `sensor.runelite_%username_activity_%skilname`
+
+The state of the sensor is the score (KC).
+It has the following _attributes: 
+`ID` Is the OSRS skill ID <br>
+`Name` Friendly name of the skill<br>
+
+`Rank` Rank on the highscores<br>
+`Score` Current score (KC)
+
+### Dailies
+
+Each daily activity has it's own sensor, the state can be -1 (missing requirements for the daily), 0 (incomplete) or 1 (complete)
+The runelite plugin is currently going through checks again to make it update these automatically.
+
+The ID of the entity will be `sensor.runelite_%username_daily_%daily`
+
+Supported daily activities right now:
+
+- Herb boxes
+- Battle staves
+- Essence
+- Sand
+- Flax
+- Arrows
+- Dynamite
 
 ## Services (actions)
 
@@ -144,6 +176,22 @@ Sets the farming growth tick offset of your account. This differs per runescape 
 ### reset_birdhouses
 
 Sets the completion time of a birdhouse run to the entity. This just sets it to the current time + 50 minutes. 
+
+|**Inputs**|Info|
+|----|----|
+|Username|Only needed if you have more than 1 username hub added to the integration.
+
+### reset_big_compost
+
+Sets the completion time of the big compost bin. This just sets it to the current time + 90 minutes. 
+
+|**Inputs**|Info|
+|----|----|
+|Username|Only needed if you have more than 1 username hub added to the integration.
+
+### reset_all_dailies
+
+Sets all daily activities to 0.
 
 |**Inputs**|Info|
 |----|----|
@@ -183,6 +231,12 @@ Every single patch type has it's own service. For example `herb_patch` will calc
 ### Farming contracts
 
 Each farming contract crop type has it's own service. For example `farming_contract_herb`. The arguments are the same as the ones for patches.
+
+### Daily tasks
+
+Each daily task has it's own reset/done service. Reset to set it back to 0 (incomplete), done to set it to 1 (complete)
+The services will be called: `daily_done_%activity%`
+
 
 
 ## Dashboard overview example
