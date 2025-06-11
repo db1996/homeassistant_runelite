@@ -113,9 +113,9 @@ set_entity_data:
       selector:
         select:
           options:
-            - -1
-            - 0
-            - 1
+            - "-1"
+            - "0"
+            - "1"
 
 calculate_patch_or_crop:
   name: Calculate Patch or Crop
