@@ -13,13 +13,13 @@ It also supports dailies like battlestaves, sand etc.
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=db1996&repository=homeassistant_runelite&category=integration)
 
-1. In Home Assistant, open **HACS** in the sidebar.
-2. Click the **⋮** menu (top right) and select **Custom repositories**.
-3. Add this repository:
-   - **URL**: `https://github.com/db1996/homeassistant_runelite`
-   - **Category**: **Integration**
-4. Back in **HACS → Integrations**, locate **runelite** and click **Install**.
-5. After installation, go to **Settings → System → Integrations**, click **+ Add integration**, then search for **runelite**.
+1. Ensure HACS is installed in your Home Assistant setup. If not, follow
+   the [HACS installation guide](https://hacs.xyz/docs/setup/download).
+2. Open the HACS panel in Home Assistant.
+3. Click on the `Frontend` or `Integrations` tab.
+4. Click the `+` button and search for `Runelite`.
+5. Click `Install` to add the component to your Home Assistant setup.
+6. Restart Home Assistant after the installation completes.
 
 ### Manual Installation
 
