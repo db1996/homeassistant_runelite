@@ -1,18 +1,19 @@
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.helpers.restore_state import RestoreEntity
 import logging
+from ..helpers import sanitize
 
 _LOGGER = logging.getLogger(__name__)
 
 class OsrsSkillSensor(SensorEntity, RestoreEntity):
     """Sensor for a single OSRS skill from the hiscore API."""
-    def __init__(self, coordinator, username: str, skill_data: dict, unique_id: str):
+    def __init__(self, coordinator, username: str, skill_data: dict):
         self.coordinator = coordinator
         self._username = username
         self._skill_data = skill_data
-        self._unique_id = unique_id
+        self._unique_id = sanitize(f"runelite_{username}_skill_{skill_data['name']}")
         self._attr_name = f"Runelite {username} Skill {skill_data['name'].capitalize()}"
-        self._attr_unique_id = unique_id
+        self._attr_unique_id = self._unique_id
         self._attr_unit_of_measurement = "XP"
         self._attr_state_class = "total_increasing"
 

@@ -1,15 +1,16 @@
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.helpers.restore_state import RestoreEntity
 from datetime import datetime, timezone
+from ..helpers import sanitize
 
 class CompostBinSensor(SensorEntity, RestoreEntity):
     """Representation of compost bin status for a specific user."""
 
-    def __init__(self, username: str, unique_id: str, name: str) -> None:
+    def __init__(self, username: str) -> None:
         super().__init__()
         self._username = username
-        self._unique_id = unique_id
-        self._name = name
+        self._unique_id = f"runelite_{sanitize(username)}_compost_bin"
+        self._name = f"Runelite {username} Compost Bin"
         self._status = None
         self._completion_time = None
 

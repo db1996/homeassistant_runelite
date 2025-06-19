@@ -15,9 +15,13 @@ set_multi_entity_data:
           patch_type: herb
           farming_tick_offset: -25
           state: 1
+          current_status_effects: An arrayy of objects, each with a name, number, and time
+          current_health: 0-99
+          current_prayer: 0-99
+          current_run_energy: 0-100
+          current_special_attack: 0-100
         - entity_id: sensor.runelite_username_tree_patch
           status: ready
-
 set_entity_data:
   name: Set Entity Data
   description: Manually set the entity data for a farming patch.
@@ -116,6 +120,59 @@ set_entity_data:
             - "-1"
             - "0"
             - "1"
+    current_status_effects:
+      required: false
+      name: Current Status Effects
+      description: An array of effects applied to the patch, each with a name, number, and time.
+      example:
+        - name: "Growth Boost"
+          number: 2
+          time: "2025-05-17T17:00+00:00"
+      selector:
+        object:
+          properties:
+            name:
+              selector:
+                text:
+            number:
+              selector:
+                number:
+                  min: 0
+            time:
+              selector:
+                datetime:
+    current_health:
+      required: false
+      name: Current Health
+      description: The current health of the player (0-99).
+      selector:
+        number:
+          min: 0
+          max: 200
+    current_prayer:
+      required: false
+      name: Current Prayer
+      description: The current prayer points of the player (0-99).
+      selector:
+        number:
+          min: 0
+          max: 99
+    current_run_energy:
+      required: false
+      name: Current Run Energy
+      description: The current run energy of the player (0-100).
+      selector:
+        number:
+          min: 0
+          max: 100
+    current_special_attack:
+      required: false
+      name: Current Special Attack
+      description: The current special attack energy of the player (0-100).
+      selector:
+        number:
+          min: 0
+          max: 100
 
 calculate_patch_or_crop:
   name: Calculate Patch or Crop

@@ -1,13 +1,14 @@
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.helpers.restore_state import RestoreEntity
+from ..helpers import sanitize
 
 class FarmingTickOffsetSensor(SensorEntity, RestoreEntity):
     """Representation of farming tick offset for a specific user."""
 
-    def __init__(self, username: str, unique_id: str, farming_tick: int = 0) -> None:
+    def __init__(self, username: str, farming_tick: int = 0) -> None:
         super().__init__()
         self._username = username
-        self._unique_id = unique_id
+        self._unique_id = f"runelite_{sanitize(username)}_farming_tick_offset"
         self._name = f"Runelite {username} Farming tick offset"
         self._farming_tick_offset = farming_tick
 

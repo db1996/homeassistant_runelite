@@ -4,6 +4,11 @@ from __future__ import annotations
 
 import logging
 
+from custom_components.runelite.sensors.player_health import PlayerHealth
+from custom_components.runelite.sensors.player_prayer import PlayerPrayer
+from custom_components.runelite.sensors.player_run_energy import PlayerRunEnergy
+from custom_components.runelite.sensors.player_special_attack import PlayerSpecialAttack
+from custom_components.runelite.sensors.player_status_effects import PlayerStatusEffects
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -17,6 +22,7 @@ from .sensors.contract import FarmingContractSensor
 from .sensors.birdhouses import BirdhousesSensor
 from .sensors.farming_tick import FarmingTickOffsetSensor
 from .sensors.compost_bin import CompostBinSensor
+from .helpers import sanitize
 
 DOMAIN = "runelite"
 _LOGGER = logging.getLogger(__name__)
@@ -37,20 +43,27 @@ async def async_setup_entry(
     # create skills sensors
     entities = []
 
-    # Example: create a sensor for each skill in the hiscore data
+    max_health = 0
+    max_prayer = 0
     if coordinator.data:
         for skill in coordinator.data.get("skills", []):
             skill_name = skill.get('name').lower()
             if skill_name in ["overall"]:
                 skill_name = "total"  # Normalize the name for the total skill
 
+            if skill_name == "hitpoints":
+                max_health = skill.get('Level', 0)
+
+            elif skill_name == "prayer":
+                max_prayer = skill.get('Level', 0)
+
+
             skill['name'] = skill_name.capitalize()  # Capitalize the skill name for display
                 
             skill_entity = OsrsSkillSensor(
                 coordinator,
                 username,
-                skill,
-                f"runelite_{username.lower()}_skill_{skill_name}",
+                skill
             )
             entities.append(skill_entity)
         for activity in coordinator.data.get("activities", []):
@@ -59,49 +72,55 @@ async def async_setup_entry(
             activity_entity = OsrsActivitySensor(
                 coordinator,
                 username,
-                activity,
-                f"runelite_{username.lower()}_activity_{activity_name}",
+                activity
             )
             _LOGGER.debug('Adding activity sensor for %s: %s', username, activity_name)
             entities.append(activity_entity)
-
 
     usernameFixed = username.replace(" ", "_").lower()
     _LOGGER.debug('Setting up sensors for %s', username)
     for patch_type, patch_data in PATCH_TYPE_DATA.items():
         # sanitize the patch type for unique_id
-        patch_type = patch_type.replace(" ", "_").lower()
-        unique_id = f"runelite_{usernameFixed.lower()}_{patch_type.lower()}_patch"
-        _LOGGER.debug('Setting up sensors for %s %s', usernameFixed, unique_id)
+        _LOGGER.debug('Setting up sensors for %s %s', usernameFixed, patch_type)
 
-        entity = FarmingPatchTypeSensor(username, patch_type, unique_id, patch_data)
+        entity = FarmingPatchTypeSensor(username, patch_type, patch_data)
         entities.append(entity)
 
     # Add a generic contract sensor for this username (keeping this for now)
-    contract_unique_id = f"runelite_{usernameFixed.lower()}_farming_contract"
-    contract_entity = FarmingContractSensor(username, contract_unique_id)
+    contract_entity = FarmingContractSensor(username)
     entities.append(contract_entity)
 
-    birdhouse_unique_id = f"runelite_{usernameFixed.lower()}_birdhouses"
-    birdhouse_entity = BirdhousesSensor(username, birdhouse_unique_id)
+    birdhouse_entity = BirdhousesSensor(username)
     entities.append(birdhouse_entity)
 
-    big_compost_unique_id = f"runelite_{usernameFixed.lower()}_big_compost"
-    big_compost_entity = CompostBinSensor(username, big_compost_unique_id, f"Runelite {usernameFixed.lower()} Big Compost")
+    big_compost_entity = CompostBinSensor(username)
     entities.append(big_compost_entity)
 
-    farming_tick_unique_id = f"runelite_{usernameFixed.lower()}_farming_tick_offset"
-    farming_tick_entity = FarmingTickOffsetSensor(username, farming_tick_unique_id)
+    farming_tick_entity = FarmingTickOffsetSensor(username)
     entities.append(farming_tick_entity)
 
     for daily_sensor in DAILY_SENSORS:
         # sanitize the daily sensor name for unique_id
-        sensor_name = daily_sensor.replace("_", " ").lower()
-        unique_id = f"runelite_{usernameFixed.lower()}_daily_{daily_sensor}"
-        _LOGGER.debug('Setting up daily sensor for %s: %s', usernameFixed, unique_id)
+        sensor_name = sanitize(daily_sensor)
+        _LOGGER.debug('Setting up daily sensor for %s: %s', usernameFixed, sensor_name)
 
-        entity = DailySensor(username, sensor_name, unique_id)
+        entity = DailySensor(username, sensor_name)
         entities.append(entity)
+    _LOGGER.warning("Creating player stats", max_health, max_prayer)
+    health_entity = PlayerHealth(username, max_health)
+    entities.append(health_entity)
+
+    prayer_entity = PlayerPrayer(username, max_prayer)
+    entities.append(prayer_entity)
+
+    run_energy_entity = PlayerRunEnergy(username)
+    entities.append(run_energy_entity)
+
+    special_attack_entity = PlayerSpecialAttack(username)
+    entities.append(special_attack_entity)
+
+    status_effects_entity = PlayerStatusEffects(username)
+    entities.append(status_effects_entity)
 
     async_add_entities(entities)
 

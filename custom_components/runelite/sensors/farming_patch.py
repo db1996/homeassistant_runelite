@@ -2,6 +2,7 @@ from homeassistant.components.sensor import SensorEntity
 from homeassistant.helpers.restore_state import RestoreEntity
 from datetime import datetime, timezone
 import logging
+from ..helpers import sanitize
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -9,11 +10,11 @@ class FarmingPatchTypeSensor(SensorEntity, RestoreEntity):
     """Representation of a specific type of farming patch with its data."""
 
     def __init__(
-        self, username: str, patch_type: str, unique_id: str, patch_data: dict
+        self, username: str, patch_type: str, patch_data: dict
     ) -> None:
         self._username = username
         self._patch_type = patch_type
-        self._unique_id = unique_id
+        self._unique_id = sanitize(f"runelite_{username}_{patch_type}_patch")
         self._name = f"Runelite {username} {patch_type} Patch"
         self._cycle_length_minutes = patch_data.get("cycle_length_minutes")
         self._global_cycles = patch_data.get("global_cycles")

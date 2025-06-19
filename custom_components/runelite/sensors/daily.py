@@ -1,17 +1,18 @@
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.helpers.restore_state import RestoreEntity
 import logging
+from ..helpers import sanitize
 
 _LOGGER = logging.getLogger(__name__)
 
 class DailySensor(SensorEntity, RestoreEntity):
     """Sensor for a daily task in OSRS."""
-    def __init__(self, username: str, name: str, unique_id: str):
+    def __init__(self, username: str, name: str):
         self._task_state = -1
         self._username = username
-        self._unique_id = unique_id
+        self._unique_id = sanitize(f"runelite_{username}_daily_{name}")
         self._attr_name = f"Runelite {username} Daily {name.capitalize()}"
-        self._attr_unique_id = unique_id
+        self._attr_unique_id = self._unique_id
         self._attr_unit_of_measurement = "Done"
 
     @property

@@ -1,6 +1,11 @@
 """Services for the RuneLite Farming integration."""
 
 import logging
+from custom_components.runelite.sensors.player_health import PlayerHealth
+from custom_components.runelite.sensors.player_prayer import PlayerPrayer
+from custom_components.runelite.sensors.player_run_energy import PlayerRunEnergy
+from custom_components.runelite.sensors.player_special_attack import PlayerSpecialAttack
+from custom_components.runelite.sensors.player_status_effects import PlayerStatusEffects
 from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers import entity_registry as er
@@ -29,6 +34,15 @@ SET_ENTITY_DATA_SCHEMA = vol.Schema(
         vol.Optional("farming_tick_offset"): vol.All(
             int, vol.Range(min=-30, max=30)
         ),
+        vol.Optional("current_status_effects"): vol.All([{
+            vol.Required("name"): str,
+            vol.Required("number"): int,
+            vol.Required("time"): str
+        }]),
+        vol.Optional("current_health"): vol.All(int, vol.Range(min=0, max=200)),
+        vol.Optional("current_prayer"): vol.All(int, vol.Range(min=0, max=99)),
+        vol.Optional("current_run_energy"): vol.All(int, vol.Range(min=0, max=100)),
+        vol.Optional("current_special_attack"): vol.All(int, vol.Range(min=0, max=100)),
     }
 )
 
@@ -36,20 +50,7 @@ SET_MULTI_ENTITY_DATA_SCHEMA = vol.Schema(
     {
         vol.Required("entities"): vol.All(
             [  # A list of dicts with the same schema as SET_ENTITY_DATA_SCHEMA
-                vol.Schema(
-                    {
-                        vol.Required("entity_id"): cv.entity_id,
-                        vol.Optional("completion_time"): cv.datetime,
-                        vol.Optional("username"): cv.string,
-                        vol.Optional("status"): cv.string,
-                        vol.Optional("crop_type"): cv.string,
-                        vol.Optional("patch_type"): cv.string,
-                        vol.Optional("state"): vol.All(int, vol.Range(min=-1, max=1)),
-                        vol.Optional("farming_tick_offset"): vol.All(
-                            int, vol.Range(min=-30, max=30)
-                        ),
-                    }
-                )
+                SET_ENTITY_DATA_SCHEMA
             ]
         )
     }
@@ -256,7 +257,8 @@ class RuneLiteFarmingServices:
         for entry_id, entry_data in integration_data.items():
             sensor_entity = entry_data.get("entities", {}).get(entity_id)
             # get instance of the sensor entity
-            if isinstance(sensor_entity, (FarmingPatchTypeSensor, FarmingContractSensor, FarmingTickOffsetSensor, BirdhousesSensor, DailySensor, OsrsActivitySensor, OsrsSkillSensor, CompostBinSensor)):
+            if isinstance(sensor_entity, (FarmingPatchTypeSensor, FarmingContractSensor, FarmingTickOffsetSensor, BirdhousesSensor, DailySensor, OsrsActivitySensor, OsrsSkillSensor, CompostBinSensor,
+                                          PlayerRunEnergy, PlayerHealth, PlayerPrayer, PlayerSpecialAttack, PlayerStatusEffects)):
                 _LOGGER.debug(f"Updating entity '{entity_id}' with data: {data}")
                 await sensor_entity.update_data(data)
                 return
@@ -274,18 +276,10 @@ class RuneLiteFarmingServices:
                 continue  # Optionally raise/log error here
 
             update_data = {}
-            if "completion_time" in entity_data:
-                update_data["completion_time"] = entity_data["completion_time"]
-            if "status" in entity_data:
-                update_data["status"] = entity_data["status"]
-            if "crop_type" in entity_data:
-                update_data["crop_type"] = entity_data["crop_type"]
-            if "patch_type" in entity_data:
-                update_data["patch_type"] = entity_data["patch_type"]
-            if "state" in entity_data:
-                update_data["state"] = entity_data["state"]
-            if "farming_tick_offset" in entity_data:
-                update_data["farming_tick_offset"] = entity_data["farming_tick_offset"]
+            for key, value in entity_data.items():
+                if key == "entity_id":
+                    continue
+                update_data[key] = value
 
             await self.async_update_entity_data(entity_id, update_data)
         return
@@ -293,26 +287,16 @@ class RuneLiteFarmingServices:
     async def async_set_entity_data_service(self, service: ServiceCall) -> None:
         """Set the completion time and/or status of a farming patch."""
         entity_id = service.data.get("entity_id")
-        completion_time = service.data.get("completion_time")
-        status = service.data.get("status")
-        crop_type = service.data.get("crop_type")
-        patch_type = service.data.get("patch_type")
-        state = service.data.get("state")
-        farming_tick_offset = service.data.get("farming_tick_offset")
-        
+        if not entity_id:
+            _LOGGER.error("Entity ID is required.")
+            return
+
+        entity_data = service.data.copy()
         update_data = {}
-        if completion_time:
-            update_data["completion_time"] = completion_time
-        if status:
-            update_data["status"] = status
-        if crop_type:
-            update_data["crop_type"] = crop_type
-        if patch_type:
-            update_data["patch_type"] = patch_type
-        if state is not None:
-            update_data["state"] = state
-        if farming_tick_offset is not None:
-            update_data["farming_tick_offset"] = farming_tick_offset
+        for key, value in entity_data.items():
+            if key == "entity_id":
+                continue
+            update_data[key] = value
 
         await self.async_update_entity_data(entity_id, update_data)
         return
