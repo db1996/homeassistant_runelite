@@ -120,27 +120,6 @@ set_entity_data:
             - "-1"
             - "0"
             - "1"
-    current_status_effects:
-      required: false
-      name: Current Status Effects
-      description: An array of effects applied to the patch, each with a name, number, and time.
-      example:
-        - name: "Growth Boost"
-          number: 2
-          time: "2025-05-17T17:00+00:00"
-      selector:
-        object:
-          properties:
-            name:
-              selector:
-                text:
-            number:
-              selector:
-                number:
-                  min: 0
-            time:
-              selector:
-                datetime:
     current_health:
       required: false
       name: Current Health
