@@ -9,6 +9,7 @@ from custom_components.runelite.sensors.player_prayer import PlayerPrayer
 from custom_components.runelite.sensors.player_run_energy import PlayerRunEnergy
 from custom_components.runelite.sensors.player_special_attack import PlayerSpecialAttack
 from custom_components.runelite.sensors.player_status_effects import PlayerStatusEffects
+from custom_components.runelite.sensors.player_status import PlayerStatus
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -121,6 +122,9 @@ async def async_setup_entry(
 
     status_effects_entity = PlayerStatusEffects(username)
     entities.append(status_effects_entity)
+
+    player_status_entity = PlayerStatus(username)
+    entities.append(player_status_entity)
 
     async_add_entities(entities)
 

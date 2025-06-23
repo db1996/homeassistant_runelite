@@ -5,6 +5,7 @@ from custom_components.runelite.sensors.player_health import PlayerHealth
 from custom_components.runelite.sensors.player_prayer import PlayerPrayer
 from custom_components.runelite.sensors.player_run_energy import PlayerRunEnergy
 from custom_components.runelite.sensors.player_special_attack import PlayerSpecialAttack
+from custom_components.runelite.sensors.player_status import PlayerStatus
 from custom_components.runelite.sensors.player_status_effects import PlayerStatusEffects
 from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.config_entries import ConfigEntry
@@ -43,6 +44,8 @@ SET_ENTITY_DATA_SCHEMA = vol.Schema(
         vol.Optional("current_prayer"): vol.All(int, vol.Range(min=0, max=99)),
         vol.Optional("current_run_energy"): vol.All(int, vol.Range(min=0, max=100)),
         vol.Optional("current_special_attack"): vol.All(int, vol.Range(min=0, max=100)),
+        vol.Optional("is_online"): cv.boolean,
+        vol.Optional("world"): cv.string,
     }
 )
 
@@ -258,7 +261,7 @@ class RuneLiteFarmingServices:
             sensor_entity = entry_data.get("entities", {}).get(entity_id)
             # get instance of the sensor entity
             if isinstance(sensor_entity, (FarmingPatchTypeSensor, FarmingContractSensor, FarmingTickOffsetSensor, BirdhousesSensor, DailySensor, OsrsActivitySensor, OsrsSkillSensor, CompostBinSensor,
-                                          PlayerRunEnergy, PlayerHealth, PlayerPrayer, PlayerSpecialAttack, PlayerStatusEffects)):
+                                          PlayerRunEnergy, PlayerHealth, PlayerPrayer, PlayerSpecialAttack, PlayerStatusEffects, PlayerStatus)):
                 _LOGGER.debug(f"Updating entity '{entity_id}' with data: {data}")
                 await sensor_entity.update_data(data)
                 return
