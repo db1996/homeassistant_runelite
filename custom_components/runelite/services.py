@@ -46,6 +46,7 @@ SET_ENTITY_DATA_SCHEMA = vol.Schema(
         vol.Optional("current_special_attack"): vol.All(int, vol.Range(min=0, max=100)),
         vol.Optional("is_online"): cv.boolean,
         vol.Optional("world"): cv.string,
+        vol.Optional("virtual_level"): vol.All(int, vol.Range(min=-100, max=200)),
     }
 )
 
@@ -261,7 +262,7 @@ class RuneLiteFarmingServices:
             sensor_entity = entry_data.get("entities", {}).get(entity_id)
             # get instance of the sensor entity
             if isinstance(sensor_entity, (FarmingPatchTypeSensor, FarmingContractSensor, FarmingTickOffsetSensor, BirdhousesSensor, DailySensor, OsrsActivitySensor, OsrsSkillSensor, CompostBinSensor,
-                                          PlayerRunEnergy, PlayerHealth, PlayerPrayer, PlayerSpecialAttack, PlayerStatusEffects, PlayerStatus)):
+                                          PlayerRunEnergy, PlayerHealth, PlayerPrayer, PlayerSpecialAttack, PlayerStatusEffects, PlayerStatus, OsrsSkillSensor)):
                 _LOGGER.debug(f"Updating entity '{entity_id}' with data: {data}")
                 await sensor_entity.update_data(data)
                 return
