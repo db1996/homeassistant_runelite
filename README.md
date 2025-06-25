@@ -7,6 +7,8 @@
 Custom HACS integration for tracking farming patches, farming contracts and birdhouse timers. It also tracks skill XP, total XP and boss KC's over time. 
 It also supports dailies like battlestaves, sand etc.
 
+It now also supports live player status: Health, prayer, run energy, special attack, online/offline and which world.
+
 ## Installation
 
 ### Via HACS
@@ -125,6 +127,7 @@ It has the following _attributes:
 
 `Rank` Rank on the highscores<br>
 `Level` Currrent level<br>
+`virtual_level` Currrent skill boost, this is for future proofing, will add functionality in the runelite plugin later to update these automatically<br>
 `Xp` Current XP
 
 The skills automatically update every 6 hours from the OSRS highscores. There is a service to refetch.
@@ -300,7 +303,1109 @@ Updates in the waiting list
 - Improved settings, no longer individual farming patches but general things.
   - New player stats are turned off by default, they will result in lots of calls to HA, especially the run energy. I have not experienced slowdowns myself but let me know if I need to add delays to it, or a setting for that.
 
-## Dashboard overview example
+
+## Examples
+
+### Skills overview, current player status and online status
+
+I basically recreated the skills screen in OSRS, showing virtual level (boosts) and level. 
+For this dashboard I am using lovelace button-card: https://github.com/custom-cards/button-card
+I am also using the skill images from the wiki directly in the dashboard.
+
+```yaml
+type: grid
+columns: 3
+square: false
+cards:
+  - type: custom:button-card
+    entity: sensor.runelite_%username%_skill_attack
+    show_state: false
+    show_name: false
+    show_icon: false
+    styles:
+      custom_fields:
+        info:
+          - justify-self: end
+          - align-self: end
+      card:
+        - background-image: |-
+            [[[
+              const skillName = entity.attributes.name?.replace(/\s+/g, '_') ?? 'Unknown';
+              return `url('https://oldschool.runescape.wiki/images/${skillName}_icon_%28detail%29.png')`;
+            ]]]
+        - background-size: 30px 30px
+        - background-repeat: no-repeat
+        - background-position: 6px center
+        - background-color: "#1e1e1e"
+        - border-radius: 10px
+        - height: 40px
+        - width: 80px
+        - padding-left: 10px
+        - position: relative
+    custom_fields:
+      info: |
+        [[[
+          const level = entity.attributes.level ?? 'N/A';
+          const virtual = entity.attributes.virtual_level ?? '';
+          return `
+            <div style="position: absolute; right: 6px; bottom: 6px; text-align: right; font-size: 11px; line-height: 12px; color: white; text-shadow: 0px 0px 3px black;">
+              <div style="position: relative">
+                <div style="position: absolute; left: -30px; top: -25px">${virtual}</div>
+                <div style="position: absolute; left: -15px; top: -18px">/</div>
+                <div style="position: absolute; left: -10px; top: -10px">${level}</div>
+              </div>
+            </div>
+          `;
+        ]]]
+  - type: custom:button-card
+    entity: sensor.runelite_%username%_skill_hitpoints
+    show_state: false
+    show_name: false
+    show_icon: false
+    styles:
+      custom_fields:
+        info:
+          - justify-self: end
+          - align-self: end
+      card:
+        - background-image: |-
+            [[[
+              const skillName = entity.attributes.name?.replace(/\s+/g, '_') ?? 'Unknown';
+              return `url('https://oldschool.runescape.wiki/images/${skillName}_icon_%28detail%29.png')`;
+            ]]]
+        - background-size: 30px 30px
+        - background-repeat: no-repeat
+        - background-position: 6px center
+        - background-color: "#1e1e1e"
+        - border-radius: 10px
+        - height: 40px
+        - width: 80px
+        - padding-left: 10px
+        - position: relative
+    custom_fields:
+      info: |
+        [[[
+          const level = entity.attributes.level ?? 'N/A';
+          const virtual = entity.attributes.virtual_level ?? '';
+          return `
+            <div style="position: absolute; right: 6px; bottom: 6px; text-align: right; font-size: 11px; line-height: 12px; color: white; text-shadow: 0px 0px 3px black;">
+              <div style="position: relative">
+                <div style="position: absolute; left: -30px; top: -25px">${virtual}</div>
+                <div style="position: absolute; left: -15px; top: -18px">/</div>
+                <div style="position: absolute; left: -10px; top: -10px">${level}</div>
+              </div>
+            </div>
+          `;
+        ]]]
+  - type: custom:button-card
+    entity: sensor.runelite_%username%_skill_mining
+    show_state: false
+    show_name: false
+    show_icon: false
+    styles:
+      custom_fields:
+        info:
+          - justify-self: end
+          - align-self: end
+      card:
+        - background-image: |-
+            [[[
+              const skillName = entity.attributes.name?.replace(/\s+/g, '_') ?? 'Unknown';
+              return `url('https://oldschool.runescape.wiki/images/${skillName}_icon_%28detail%29.png')`;
+            ]]]
+        - background-size: 30px 30px
+        - background-repeat: no-repeat
+        - background-position: 6px center
+        - background-color: "#1e1e1e"
+        - border-radius: 10px
+        - height: 40px
+        - width: 80px
+        - padding-left: 10px
+        - position: relative
+    custom_fields:
+      info: |
+        [[[
+          const level = entity.attributes.level ?? 'N/A';
+          const virtual = entity.attributes.virtual_level ?? '';
+          return `
+            <div style="position: absolute; right: 6px; bottom: 6px; text-align: right; font-size: 11px; line-height: 12px; color: white; text-shadow: 0px 0px 3px black;">
+              <div style="position: relative">
+                <div style="position: absolute; left: -30px; top: -25px">${virtual}</div>
+                <div style="position: absolute; left: -15px; top: -18px">/</div>
+                <div style="position: absolute; left: -10px; top: -10px">${level}</div>
+              </div>
+            </div>
+          `;
+        ]]]
+  - type: custom:button-card
+    entity: sensor.runelite_%username%_skill_strength
+    show_state: false
+    show_name: false
+    show_icon: false
+    styles:
+      custom_fields:
+        info:
+          - justify-self: end
+          - align-self: end
+      card:
+        - background-image: |-
+            [[[
+              const skillName = entity.attributes.name?.replace(/\s+/g, '_') ?? 'Unknown';
+              return `url('https://oldschool.runescape.wiki/images/${skillName}_icon_%28detail%29.png')`;
+            ]]]
+        - background-size: 30px 30px
+        - background-repeat: no-repeat
+        - background-position: 6px center
+        - background-color: "#1e1e1e"
+        - border-radius: 10px
+        - height: 40px
+        - width: 80px
+        - padding-left: 10px
+        - position: relative
+    custom_fields:
+      info: |
+        [[[
+          const level = entity.attributes.level ?? 'N/A';
+          const virtual = entity.attributes.virtual_level ?? '';
+          return `
+            <div style="position: absolute; right: 6px; bottom: 6px; text-align: right; font-size: 11px; line-height: 12px; color: white; text-shadow: 0px 0px 3px black;">
+              <div style="position: relative">
+                <div style="position: absolute; left: -30px; top: -25px">${virtual}</div>
+                <div style="position: absolute; left: -15px; top: -18px">/</div>
+                <div style="position: absolute; left: -10px; top: -10px">${level}</div>
+              </div>
+            </div>
+          `;
+        ]]]
+  - type: custom:button-card
+    entity: sensor.runelite_%username%_skill_agility
+    show_state: false
+    show_name: false
+    show_icon: false
+    styles:
+      custom_fields:
+        info:
+          - justify-self: end
+          - align-self: end
+      card:
+        - background-image: |-
+            [[[
+              const skillName = entity.attributes.name?.replace(/\s+/g, '_') ?? 'Unknown';
+              return `url('https://oldschool.runescape.wiki/images/${skillName}_icon_%28detail%29.png')`;
+            ]]]
+        - background-size: 30px 30px
+        - background-repeat: no-repeat
+        - background-position: 6px center
+        - background-color: "#1e1e1e"
+        - border-radius: 10px
+        - height: 40px
+        - width: 80px
+        - padding-left: 10px
+        - position: relative
+    custom_fields:
+      info: |
+        [[[
+          const level = entity.attributes.level ?? 'N/A';
+          const virtual = entity.attributes.virtual_level ?? '';
+          return `
+            <div style="position: absolute; right: 6px; bottom: 6px; text-align: right; font-size: 11px; line-height: 12px; color: white; text-shadow: 0px 0px 3px black;">
+              <div style="position: relative">
+                <div style="position: absolute; left: -30px; top: -25px">${virtual}</div>
+                <div style="position: absolute; left: -15px; top: -18px">/</div>
+                <div style="position: absolute; left: -10px; top: -10px">${level}</div>
+              </div>
+            </div>
+          `;
+        ]]]
+  - type: custom:button-card
+    entity: sensor.runelite_%username%_skill_smithing
+    show_state: false
+    show_name: false
+    show_icon: false
+    styles:
+      custom_fields:
+        info:
+          - justify-self: end
+          - align-self: end
+      card:
+        - background-image: |-
+            [[[
+              const skillName = entity.attributes.name?.replace(/\s+/g, '_') ?? 'Unknown';
+              return `url('https://oldschool.runescape.wiki/images/${skillName}_icon_%28detail%29.png')`;
+            ]]]
+        - background-size: 30px 30px
+        - background-repeat: no-repeat
+        - background-position: 6px center
+        - background-color: "#1e1e1e"
+        - border-radius: 10px
+        - height: 40px
+        - width: 80px
+        - padding-left: 10px
+        - position: relative
+    custom_fields:
+      info: |
+        [[[
+          const level = entity.attributes.level ?? 'N/A';
+          const virtual = entity.attributes.virtual_level ?? '';
+          return `
+            <div style="position: absolute; right: 6px; bottom: 6px; text-align: right; font-size: 11px; line-height: 12px; color: white; text-shadow: 0px 0px 3px black;">
+              <div style="position: relative">
+                <div style="position: absolute; left: -30px; top: -25px">${virtual}</div>
+                <div style="position: absolute; left: -15px; top: -18px">/</div>
+                <div style="position: absolute; left: -10px; top: -10px">${level}</div>
+              </div>
+            </div>
+          `;
+        ]]]
+  - type: custom:button-card
+    entity: sensor.runelite_%username%_skill_defence
+    show_state: false
+    show_name: false
+    show_icon: false
+    styles:
+      custom_fields:
+        info:
+          - justify-self: end
+          - align-self: end
+      card:
+        - background-image: |-
+            [[[
+              const skillName = entity.attributes.name?.replace(/\s+/g, '_') ?? 'Unknown';
+              return `url('https://oldschool.runescape.wiki/images/${skillName}_icon_%28detail%29.png')`;
+            ]]]
+        - background-size: 30px 30px
+        - background-repeat: no-repeat
+        - background-position: 6px center
+        - background-color: "#1e1e1e"
+        - border-radius: 10px
+        - height: 40px
+        - width: 80px
+        - padding-left: 10px
+        - position: relative
+    custom_fields:
+      info: |
+        [[[
+          const level = entity.attributes.level ?? 'N/A';
+          const virtual = entity.attributes.virtual_level ?? '';
+          return `
+            <div style="position: absolute; right: 6px; bottom: 6px; text-align: right; font-size: 11px; line-height: 12px; color: white; text-shadow: 0px 0px 3px black;">
+              <div style="position: relative">
+                <div style="position: absolute; left: -30px; top: -25px">${virtual}</div>
+                <div style="position: absolute; left: -15px; top: -18px">/</div>
+                <div style="position: absolute; left: -10px; top: -10px">${level}</div>
+              </div>
+            </div>
+          `;
+        ]]]
+  - type: custom:button-card
+    entity: sensor.runelite_%username%_skill_herblore
+    show_state: false
+    show_name: false
+    show_icon: false
+    styles:
+      custom_fields:
+        info:
+          - justify-self: end
+          - align-self: end
+      card:
+        - background-image: |-
+            [[[
+              const skillName = entity.attributes.name?.replace(/\s+/g, '_') ?? 'Unknown';
+              return `url('https://oldschool.runescape.wiki/images/${skillName}_icon_%28detail%29.png')`;
+            ]]]
+        - background-size: 30px 30px
+        - background-repeat: no-repeat
+        - background-position: 6px center
+        - background-color: "#1e1e1e"
+        - border-radius: 10px
+        - height: 40px
+        - width: 80px
+        - padding-left: 10px
+        - position: relative
+    custom_fields:
+      info: |
+        [[[
+          const level = entity.attributes.level ?? 'N/A';
+          const virtual = entity.attributes.virtual_level ?? '';
+          return `
+            <div style="position: absolute; right: 6px; bottom: 6px; text-align: right; font-size: 11px; line-height: 12px; color: white; text-shadow: 0px 0px 3px black;">
+              <div style="position: relative">
+                <div style="position: absolute; left: -30px; top: -25px">${virtual}</div>
+                <div style="position: absolute; left: -15px; top: -18px">/</div>
+                <div style="position: absolute; left: -10px; top: -10px">${level}</div>
+              </div>
+            </div>
+          `;
+        ]]]
+  - type: custom:button-card
+    entity: sensor.runelite_%username%_skill_fishing
+    show_state: false
+    show_name: false
+    show_icon: false
+    styles:
+      custom_fields:
+        info:
+          - justify-self: end
+          - align-self: end
+      card:
+        - background-image: |-
+            [[[
+              const skillName = entity.attributes.name?.replace(/\s+/g, '_') ?? 'Unknown';
+              return `url('https://oldschool.runescape.wiki/images/${skillName}_icon_%28detail%29.png')`;
+            ]]]
+        - background-size: 30px 30px
+        - background-repeat: no-repeat
+        - background-position: 6px center
+        - background-color: "#1e1e1e"
+        - border-radius: 10px
+        - height: 40px
+        - width: 80px
+        - padding-left: 10px
+        - position: relative
+    custom_fields:
+      info: |
+        [[[
+          const level = entity.attributes.level ?? 'N/A';
+          const virtual = entity.attributes.virtual_level ?? '';
+          return `
+            <div style="position: absolute; right: 6px; bottom: 6px; text-align: right; font-size: 11px; line-height: 12px; color: white; text-shadow: 0px 0px 3px black;">
+              <div style="position: relative">
+                <div style="position: absolute; left: -30px; top: -25px">${virtual}</div>
+                <div style="position: absolute; left: -15px; top: -18px">/</div>
+                <div style="position: absolute; left: -10px; top: -10px">${level}</div>
+              </div>
+            </div>
+          `;
+        ]]]
+  - type: custom:button-card
+    entity: sensor.runelite_%username%_skill_ranged
+    show_state: false
+    show_name: false
+    show_icon: false
+    styles:
+      custom_fields:
+        info:
+          - justify-self: end
+          - align-self: end
+      card:
+        - background-image: |-
+            [[[
+              const skillName = entity.attributes.name?.replace(/\s+/g, '_') ?? 'Unknown';
+              return `url('https://oldschool.runescape.wiki/images/${skillName}_icon_%28detail%29.png')`;
+            ]]]
+        - background-size: 30px 30px
+        - background-repeat: no-repeat
+        - background-position: 6px center
+        - background-color: "#1e1e1e"
+        - border-radius: 10px
+        - height: 40px
+        - width: 80px
+        - padding-left: 10px
+        - position: relative
+    custom_fields:
+      info: |
+        [[[
+          const level = entity.attributes.level ?? 'N/A';
+          const virtual = entity.attributes.virtual_level ?? '';
+          return `
+            <div style="position: absolute; right: 6px; bottom: 6px; text-align: right; font-size: 11px; line-height: 12px; color: white; text-shadow: 0px 0px 3px black;">
+              <div style="position: relative">
+                <div style="position: absolute; left: -30px; top: -25px">${virtual}</div>
+                <div style="position: absolute; left: -15px; top: -18px">/</div>
+                <div style="position: absolute; left: -10px; top: -10px">${level}</div>
+              </div>
+            </div>
+          `;
+        ]]]
+  - type: custom:button-card
+    entity: sensor.runelite_%username%_skill_thieving
+    show_state: false
+    show_name: false
+    show_icon: false
+    styles:
+      custom_fields:
+        info:
+          - justify-self: end
+          - align-self: end
+      card:
+        - background-image: |-
+            [[[
+              const skillName = entity.attributes.name?.replace(/\s+/g, '_') ?? 'Unknown';
+              return `url('https://oldschool.runescape.wiki/images/${skillName}_icon_%28detail%29.png')`;
+            ]]]
+        - background-size: 30px 30px
+        - background-repeat: no-repeat
+        - background-position: 6px center
+        - background-color: "#1e1e1e"
+        - border-radius: 10px
+        - height: 40px
+        - width: 80px
+        - padding-left: 10px
+        - position: relative
+    custom_fields:
+      info: |
+        [[[
+          const level = entity.attributes.level ?? 'N/A';
+          const virtual = entity.attributes.virtual_level ?? '';
+          return `
+            <div style="position: absolute; right: 6px; bottom: 6px; text-align: right; font-size: 11px; line-height: 12px; color: white; text-shadow: 0px 0px 3px black;">
+              <div style="position: relative">
+                <div style="position: absolute; left: -30px; top: -25px">${virtual}</div>
+                <div style="position: absolute; left: -15px; top: -18px">/</div>
+                <div style="position: absolute; left: -10px; top: -10px">${level}</div>
+              </div>
+            </div>
+          `;
+        ]]]
+  - type: custom:button-card
+    entity: sensor.runelite_%username%_skill_cooking
+    show_state: false
+    show_name: false
+    show_icon: false
+    styles:
+      custom_fields:
+        info:
+          - justify-self: end
+          - align-self: end
+      card:
+        - background-image: |-
+            [[[
+              const skillName = entity.attributes.name?.replace(/\s+/g, '_') ?? 'Unknown';
+              return `url('https://oldschool.runescape.wiki/images/${skillName}_icon_%28detail%29.png')`;
+            ]]]
+        - background-size: 30px 30px
+        - background-repeat: no-repeat
+        - background-position: 6px center
+        - background-color: "#1e1e1e"
+        - border-radius: 10px
+        - height: 40px
+        - width: 80px
+        - padding-left: 10px
+        - position: relative
+    custom_fields:
+      info: |
+        [[[
+          const level = entity.attributes.level ?? 'N/A';
+          const virtual = entity.attributes.virtual_level ?? '';
+          return `
+            <div style="position: absolute; right: 6px; bottom: 6px; text-align: right; font-size: 11px; line-height: 12px; color: white; text-shadow: 0px 0px 3px black;">
+              <div style="position: relative">
+                <div style="position: absolute; left: -30px; top: -25px">${virtual}</div>
+                <div style="position: absolute; left: -15px; top: -18px">/</div>
+                <div style="position: absolute; left: -10px; top: -10px">${level}</div>
+              </div>
+            </div>
+          `;
+        ]]]
+  - type: custom:button-card
+    entity: sensor.runelite_%username%_skill_prayer
+    show_state: false
+    show_name: false
+    show_icon: false
+    styles:
+      custom_fields:
+        info:
+          - justify-self: end
+          - align-self: end
+      card:
+        - background-image: |-
+            [[[
+              const skillName = entity.attributes.name?.replace(/\s+/g, '_') ?? 'Unknown';
+              return `url('https://oldschool.runescape.wiki/images/${skillName}_icon_%28detail%29.png')`;
+            ]]]
+        - background-size: 30px 30px
+        - background-repeat: no-repeat
+        - background-position: 6px center
+        - background-color: "#1e1e1e"
+        - border-radius: 10px
+        - height: 40px
+        - width: 80px
+        - padding-left: 10px
+        - position: relative
+    custom_fields:
+      info: |
+        [[[
+          const level = entity.attributes.level ?? 'N/A';
+          const virtual = entity.attributes.virtual_level ?? '';
+          return `
+            <div style="position: absolute; right: 6px; bottom: 6px; text-align: right; font-size: 11px; line-height: 12px; color: white; text-shadow: 0px 0px 3px black;">
+              <div style="position: relative">
+                <div style="position: absolute; left: -30px; top: -25px">${virtual}</div>
+                <div style="position: absolute; left: -15px; top: -18px">/</div>
+                <div style="position: absolute; left: -10px; top: -10px">${level}</div>
+              </div>
+            </div>
+          `;
+        ]]]
+  - type: custom:button-card
+    entity: sensor.runelite_%username%_skill_crafting
+    show_state: false
+    show_name: false
+    show_icon: false
+    styles:
+      custom_fields:
+        info:
+          - justify-self: end
+          - align-self: end
+      card:
+        - background-image: |-
+            [[[
+              const skillName = entity.attributes.name?.replace(/\s+/g, '_') ?? 'Unknown';
+              return `url('https://oldschool.runescape.wiki/images/${skillName}_icon_%28detail%29.png')`;
+            ]]]
+        - background-size: 30px 30px
+        - background-repeat: no-repeat
+        - background-position: 6px center
+        - background-color: "#1e1e1e"
+        - border-radius: 10px
+        - height: 40px
+        - width: 80px
+        - padding-left: 10px
+        - position: relative
+    custom_fields:
+      info: |
+        [[[
+          const level = entity.attributes.level ?? 'N/A';
+          const virtual = entity.attributes.virtual_level ?? '';
+          return `
+            <div style="position: absolute; right: 6px; bottom: 6px; text-align: right; font-size: 11px; line-height: 12px; color: white; text-shadow: 0px 0px 3px black;">
+              <div style="position: relative">
+                <div style="position: absolute; left: -30px; top: -25px">${virtual}</div>
+                <div style="position: absolute; left: -15px; top: -18px">/</div>
+                <div style="position: absolute; left: -10px; top: -10px">${level}</div>
+              </div>
+            </div>
+          `;
+        ]]]
+  - type: custom:button-card
+    entity: sensor.runelite_%username%_skill_firemaking
+    show_state: false
+    show_name: false
+    show_icon: false
+    styles:
+      custom_fields:
+        info:
+          - justify-self: end
+          - align-self: end
+      card:
+        - background-image: |-
+            [[[
+              const skillName = entity.attributes.name?.replace(/\s+/g, '_') ?? 'Unknown';
+              return `url('https://oldschool.runescape.wiki/images/${skillName}_icon_%28detail%29.png')`;
+            ]]]
+        - background-size: 30px 30px
+        - background-repeat: no-repeat
+        - background-position: 6px center
+        - background-color: "#1e1e1e"
+        - border-radius: 10px
+        - height: 40px
+        - width: 80px
+        - padding-left: 10px
+        - position: relative
+    custom_fields:
+      info: |
+        [[[
+          const level = entity.attributes.level ?? 'N/A';
+          const virtual = entity.attributes.virtual_level ?? '';
+          return `
+            <div style="position: absolute; right: 6px; bottom: 6px; text-align: right; font-size: 11px; line-height: 12px; color: white; text-shadow: 0px 0px 3px black;">
+              <div style="position: relative">
+                <div style="position: absolute; left: -30px; top: -25px">${virtual}</div>
+                <div style="position: absolute; left: -15px; top: -18px">/</div>
+                <div style="position: absolute; left: -10px; top: -10px">${level}</div>
+              </div>
+            </div>
+          `;
+        ]]]
+  - type: custom:button-card
+    entity: sensor.runelite_%username%_skill_magic
+    show_state: false
+    show_name: false
+    show_icon: false
+    styles:
+      custom_fields:
+        info:
+          - justify-self: end
+          - align-self: end
+      card:
+        - background-image: |-
+            [[[
+              const skillName = entity.attributes.name?.replace(/\s+/g, '_') ?? 'Unknown';
+              return `url('https://oldschool.runescape.wiki/images/${skillName}_icon_%28detail%29.png')`;
+            ]]]
+        - background-size: 30px 30px
+        - background-repeat: no-repeat
+        - background-position: 6px center
+        - background-color: "#1e1e1e"
+        - border-radius: 10px
+        - height: 40px
+        - width: 80px
+        - padding-left: 10px
+        - position: relative
+    custom_fields:
+      info: |
+        [[[
+          const level = entity.attributes.level ?? 'N/A';
+          const virtual = entity.attributes.virtual_level ?? '';
+          return `
+            <div style="position: absolute; right: 6px; bottom: 6px; text-align: right; font-size: 11px; line-height: 12px; color: white; text-shadow: 0px 0px 3px black;">
+              <div style="position: relative">
+                <div style="position: absolute; left: -30px; top: -25px">${virtual}</div>
+                <div style="position: absolute; left: -15px; top: -18px">/</div>
+                <div style="position: absolute; left: -10px; top: -10px">${level}</div>
+              </div>
+            </div>
+          `;
+        ]]]
+  - type: custom:button-card
+    entity: sensor.runelite_%username%_skill_fletching
+    show_state: false
+    show_name: false
+    show_icon: false
+    styles:
+      custom_fields:
+        info:
+          - justify-self: end
+          - align-self: end
+      card:
+        - background-image: |-
+            [[[
+              const skillName = entity.attributes.name?.replace(/\s+/g, '_') ?? 'Unknown';
+              return `url('https://oldschool.runescape.wiki/images/${skillName}_icon_%28detail%29.png')`;
+            ]]]
+        - background-size: 30px 30px
+        - background-repeat: no-repeat
+        - background-position: 6px center
+        - background-color: "#1e1e1e"
+        - border-radius: 10px
+        - height: 40px
+        - width: 80px
+        - padding-left: 10px
+        - position: relative
+    custom_fields:
+      info: |
+        [[[
+          const level = entity.attributes.level ?? 'N/A';
+          const virtual = entity.attributes.virtual_level ?? '';
+          return `
+            <div style="position: absolute; right: 6px; bottom: 6px; text-align: right; font-size: 11px; line-height: 12px; color: white; text-shadow: 0px 0px 3px black;">
+              <div style="position: relative">
+                <div style="position: absolute; left: -30px; top: -25px">${virtual}</div>
+                <div style="position: absolute; left: -15px; top: -18px">/</div>
+                <div style="position: absolute; left: -10px; top: -10px">${level}</div>
+              </div>
+            </div>
+          `;
+        ]]]
+  - type: custom:button-card
+    entity: sensor.runelite_%username%_skill_woodcutting
+    show_state: false
+    show_name: false
+    show_icon: false
+    styles:
+      custom_fields:
+        info:
+          - justify-self: end
+          - align-self: end
+      card:
+        - background-image: |-
+            [[[
+              const skillName = entity.attributes.name?.replace(/\s+/g, '_') ?? 'Unknown';
+              return `url('https://oldschool.runescape.wiki/images/${skillName}_icon_%28detail%29.png')`;
+            ]]]
+        - background-size: 30px 30px
+        - background-repeat: no-repeat
+        - background-position: 6px center
+        - background-color: "#1e1e1e"
+        - border-radius: 10px
+        - height: 40px
+        - width: 80px
+        - padding-left: 10px
+        - position: relative
+    custom_fields:
+      info: |
+        [[[
+          const level = entity.attributes.level ?? 'N/A';
+          const virtual = entity.attributes.virtual_level ?? '';
+          return `
+            <div style="position: absolute; right: 6px; bottom: 6px; text-align: right; font-size: 11px; line-height: 12px; color: white; text-shadow: 0px 0px 3px black;">
+              <div style="position: relative">
+                <div style="position: absolute; left: -30px; top: -25px">${virtual}</div>
+                <div style="position: absolute; left: -15px; top: -18px">/</div>
+                <div style="position: absolute; left: -10px; top: -10px">${level}</div>
+              </div>
+            </div>
+          `;
+        ]]]
+  - type: custom:button-card
+    entity: sensor.runelite_%username%_skill_runecraft
+    show_state: false
+    show_name: false
+    show_icon: false
+    styles:
+      custom_fields:
+        info:
+          - justify-self: end
+          - align-self: end
+      card:
+        - background-image: |-
+            [[[
+              const skillName = entity.attributes.name?.replace(/\s+/g, '_') ?? 'Unknown';
+              return `url('https://oldschool.runescape.wiki/images/${skillName}_icon_%28detail%29.png')`;
+            ]]]
+        - background-size: 30px 30px
+        - background-repeat: no-repeat
+        - background-position: 6px center
+        - background-color: "#1e1e1e"
+        - border-radius: 10px
+        - height: 40px
+        - width: 80px
+        - padding-left: 10px
+        - position: relative
+    custom_fields:
+      info: |
+        [[[
+          const level = entity.attributes.level ?? 'N/A';
+          const virtual = entity.attributes.virtual_level ?? '';
+          return `
+            <div style="position: absolute; right: 6px; bottom: 6px; text-align: right; font-size: 11px; line-height: 12px; color: white; text-shadow: 0px 0px 3px black;">
+              <div style="position: relative">
+                <div style="position: absolute; left: -30px; top: -25px">${virtual}</div>
+                <div style="position: absolute; left: -15px; top: -18px">/</div>
+                <div style="position: absolute; left: -10px; top: -10px">${level}</div>
+              </div>
+            </div>
+          `;
+        ]]]
+  - type: custom:button-card
+    entity: sensor.runelite_%username%_skill_slayer
+    show_state: false
+    show_name: false
+    show_icon: false
+    styles:
+      custom_fields:
+        info:
+          - justify-self: end
+          - align-self: end
+      card:
+        - background-image: |-
+            [[[
+              const skillName = entity.attributes.name?.replace(/\s+/g, '_') ?? 'Unknown';
+              return `url('https://oldschool.runescape.wiki/images/${skillName}_icon_%28detail%29.png')`;
+            ]]]
+        - background-size: 30px 30px
+        - background-repeat: no-repeat
+        - background-position: 6px center
+        - background-color: "#1e1e1e"
+        - border-radius: 10px
+        - height: 40px
+        - width: 80px
+        - padding-left: 10px
+        - position: relative
+    custom_fields:
+      info: |
+        [[[
+          const level = entity.attributes.level ?? 'N/A';
+          const virtual = entity.attributes.virtual_level ?? '';
+          return `
+            <div style="position: absolute; right: 6px; bottom: 6px; text-align: right; font-size: 11px; line-height: 12px; color: white; text-shadow: 0px 0px 3px black;">
+              <div style="position: relative">
+                <div style="position: absolute; left: -30px; top: -25px">${virtual}</div>
+                <div style="position: absolute; left: -15px; top: -18px">/</div>
+                <div style="position: absolute; left: -10px; top: -10px">${level}</div>
+              </div>
+            </div>
+          `;
+        ]]]
+  - type: custom:button-card
+    entity: sensor.runelite_%username%_skill_farming
+    show_state: false
+    show_name: false
+    show_icon: false
+    styles:
+      custom_fields:
+        info:
+          - justify-self: end
+          - align-self: end
+      card:
+        - background-image: |-
+            [[[
+              const skillName = entity.attributes.name?.replace(/\s+/g, '_') ?? 'Unknown';
+              return `url('https://oldschool.runescape.wiki/images/${skillName}_icon_%28detail%29.png')`;
+            ]]]
+        - background-size: 30px 30px
+        - background-repeat: no-repeat
+        - background-position: 6px center
+        - background-color: "#1e1e1e"
+        - border-radius: 10px
+        - height: 40px
+        - width: 80px
+        - padding-left: 10px
+        - position: relative
+    custom_fields:
+      info: |
+        [[[
+          const level = entity.attributes.level ?? 'N/A';
+          const virtual = entity.attributes.virtual_level ?? '';
+          return `
+            <div style="position: absolute; right: 6px; bottom: 6px; text-align: right; font-size: 11px; line-height: 12px; color: white; text-shadow: 0px 0px 3px black;">
+              <div style="position: relative">
+                <div style="position: absolute; left: -30px; top: -25px">${virtual}</div>
+                <div style="position: absolute; left: -15px; top: -18px">/</div>
+                <div style="position: absolute; left: -10px; top: -10px">${level}</div>
+              </div>
+            </div>
+          `;
+        ]]]
+  - type: custom:button-card
+    entity: sensor.runelite_%username%_skill_construction
+    show_state: false
+    show_name: false
+    show_icon: false
+    styles:
+      custom_fields:
+        info:
+          - justify-self: end
+          - align-self: end
+      card:
+        - background-image: |-
+            [[[
+              const skillName = entity.attributes.name?.replace(/\s+/g, '_') ?? 'Unknown';
+              return `url('https://oldschool.runescape.wiki/images/${skillName}_icon_%28detail%29.png')`;
+            ]]]
+        - background-size: 30px 30px
+        - background-repeat: no-repeat
+        - background-position: 6px center
+        - background-color: "#1e1e1e"
+        - border-radius: 10px
+        - height: 40px
+        - width: 80px
+        - padding-left: 10px
+        - position: relative
+    custom_fields:
+      info: |
+        [[[
+          const level = entity.attributes.level ?? 'N/A';
+          const virtual = entity.attributes.virtual_level ?? '';
+          return `
+            <div style="position: absolute; right: 6px; bottom: 6px; text-align: right; font-size: 11px; line-height: 12px; color: white; text-shadow: 0px 0px 3px black;">
+              <div style="position: relative">
+                <div style="position: absolute; left: -30px; top: -25px">${virtual}</div>
+                <div style="position: absolute; left: -15px; top: -18px">/</div>
+                <div style="position: absolute; left: -10px; top: -10px">${level}</div>
+              </div>
+            </div>
+          `;
+        ]]]
+  - type: custom:button-card
+    entity: sensor.runelite_%username%_skill_hunter
+    show_state: false
+    show_name: false
+    show_icon: false
+    styles:
+      custom_fields:
+        info:
+          - justify-self: end
+          - align-self: end
+      card:
+        - background-image: |-
+            [[[
+              const skillName = entity.attributes.name?.replace(/\s+/g, '_') ?? 'Unknown';
+              return `url('https://oldschool.runescape.wiki/images/${skillName}_icon_%28detail%29.png')`;
+            ]]]
+        - background-size: 30px 30px
+        - background-repeat: no-repeat
+        - background-position: 6px center
+        - background-color: "#1e1e1e"
+        - border-radius: 10px
+        - height: 40px
+        - width: 80px
+        - padding-left: 10px
+        - position: relative
+    custom_fields:
+      info: |
+        [[[
+          const level = entity.attributes.level ?? 'N/A';
+          const virtual = entity.attributes.virtual_level ?? '';
+          return `
+            <div style="position: absolute; right: 6px; bottom: 6px; text-align: right; font-size: 11px; line-height: 12px; color: white; text-shadow: 0px 0px 3px black;">
+              <div style="position: relative">
+                <div style="position: absolute; left: -30px; top: -25px">${virtual}</div>
+                <div style="position: absolute; left: -15px; top: -18px">/</div>
+                <div style="position: absolute; left: -10px; top: -10px">${level}</div>
+              </div>
+            </div>
+          `;
+        ]]]
+```
+
+### Current player status (health, prayer, spec, run energy, online/world)
+
+Also use lovelace button-card for this
+
+```yaml
+type: grid
+columns: 1
+square: false
+cards:
+  - type: custom:button-card
+    entity: sensor.runelite_%username%_health
+    show_state: false
+    show_name: false
+    show_icon: false
+    styles:
+      custom_fields:
+        info:
+          - display: flex
+          - flex-direction: row
+          - align-items: center
+          - justify-content: space-between
+          - width: 100%
+          - height: 100%
+      card:
+        - background-color: "#1e1e1e"
+        - border-radius: 10px
+        - height: 40px
+        - width: 80px
+        - padding: 6px 6px
+        - position: relative
+    custom_fields:
+      info: |
+        [[[
+          const runenergy = entity.attributes.current_health ?? 'N/A';
+          return `
+            <div style="display: flex; align-items: center; width: 100;">
+              <div style="text-align:left;background-color: #685A4B; color: white; font-size: 12px; padding: 2px 3px ; font-weight: bold;  border-radius: 3px; text-shadow: 0px 0px 3px black; width: 35px; border: 1px solid #4C4338">
+                ${runenergy}
+              </div>
+              <img src="https://oldschool.runescape.wiki/images/Hitpoints_orb.png?35952" style="width: 26px; height: 26px; margin-left: -5px" />
+            </div>
+          `;
+        ]]]
+  - type: custom:button-card
+    entity: sensor.runelite_%username%_prayer
+    show_state: false
+    show_name: false
+    show_icon: false
+    styles:
+      custom_fields:
+        info:
+          - display: flex
+          - flex-direction: row
+          - align-items: center
+          - justify-content: space-between
+          - width: 100%
+          - height: 100%
+      card:
+        - background-color: "#1e1e1e"
+        - border-radius: 10px
+        - height: 40px
+        - width: 80px
+        - padding: 6px 6px
+        - position: relative
+    custom_fields:
+      info: |
+        [[[
+          const runenergy = entity.attributes.current_prayer ?? 'N/A';
+          return `
+            <div style="display: flex; align-items: center; width: 100;">
+              <div style="text-align:left;background-color: #685A4B; color: white; font-size: 12px; padding: 2px 3px ; font-weight: bold;  border-radius: 3px; text-shadow: 0px 0px 3px black; width: 35px; border: 1px solid #4C4338">
+                ${runenergy}
+              </div>
+              <img src="https://oldschool.runescape.wiki/images/Prayer_orb.png?ebe33" style="width: 26px; height: 26px; margin-left: -5px" />
+            </div>
+          `;
+        ]]]
+  - type: custom:button-card
+    entity: sensor.runelite_%username%_run_energy
+    show_state: false
+    show_name: false
+    show_icon: false
+    styles:
+      custom_fields:
+        info:
+          - display: flex
+          - flex-direction: row
+          - align-items: center
+          - justify-content: space-between
+          - width: 100%
+          - height: 100%
+      card:
+        - background-color: "#1e1e1e"
+        - border-radius: 10px
+        - height: 40px
+        - width: 80px
+        - padding: 6px 6px
+        - position: relative
+    custom_fields:
+      info: |
+        [[[
+          const runenergy = entity.attributes.current_run_energy ?? 'N/A';
+          return `
+            <div style="display: flex; align-items: center; width: 100;">
+              <div style="text-align:left;background-color: #685A4B; color: white; font-size: 12px; padding: 2px 3px ; font-weight: bold;  border-radius: 3px; text-shadow: 0px 0px 3px black; width: 35px; border: 1px solid #4C4338">
+                ${runenergy}
+              </div>
+              <img src="https://oldschool.runescape.wiki/images/Run_energy_orb.png?b0ebe" style="width: 26px; height: 26px; margin-left: -5px" />
+            </div>
+          `;
+        ]]]
+  - type: custom:button-card
+    entity: sensor.runelite_%username%_special_attack
+    show_state: false
+    show_name: false
+    show_icon: false
+    styles:
+      custom_fields:
+        info:
+          - display: flex
+          - flex-direction: row
+          - align-items: center
+          - justify-content: space-between
+          - width: 100%
+          - height: 100%
+      card:
+        - background-color: "#1e1e1e"
+        - border-radius: 10px
+        - height: 40px
+        - width: 80px
+        - padding: 6px 6px
+        - position: relative
+    custom_fields:
+      info: |
+        [[[
+          const runenergy = entity.attributes.current_special_attack ?? 'N/A';
+          return `
+            <div style="display: flex; align-items: center; width: 100;">
+              <div style="text-align:left;background-color: #685A4B; color: white; font-size: 12px; padding: 2px 3px ; font-weight: bold;  border-radius: 3px; text-shadow: 0px 0px 3px black; width: 35px; border: 1px solid #4C4338">
+                ${runenergy}
+              </div>
+              <img src="https://oldschool.runescape.wiki/images/Special_attack_orb.png?27d06" style="width: 26px; height: 26px; margin-left: -5px" />
+            </div>
+          `;
+        ]]]
+  - type: custom:button-card
+    entity: sensor.runelite_%username%_player_status
+    show_name: false
+    show_icon: false
+    show_state: true
+    state_display: |
+      [[[
+        const is_online = entity.attributes.is_online ?? false;
+        const world = entity.attributes.world ?? -1;
+        return `${is_online ? 'w: ' + world : 'offline'}`;
+      ]]]
+    styles:
+      card:
+        - background-color: "#1e1e1e"
+        - border-radius: 10px
+        - height: 40px
+        - width: 80px
+        - padding: 6px 6px
+        - position: relative
+```
+
+### Dashboard farming overview example
 
 I have a very simple dashboard component, made with https://github.com/custom-cards/secondaryinfo-entity-row
 This shows a list of some of the patches and farming contract, their status, and completion time.
@@ -378,8 +1483,7 @@ entities:
       {% endif %}
 ```
 
-
-## Dashboard calculate patches and farming contract buttons
+### Dashboard for calculating patches and contracts
 
 A bunch of buttons and dropdowns to set various farming patches. This uses mushroom cards:
 https://github.com/piitaya/lovelace-mushroom
@@ -397,7 +1501,7 @@ cards:
   - type: horizontal-stack
     cards:
       - type: custom:mushroom-entity-card
-        entity: sensor.runelite_%username_herb_patch
+        entity: sensor.runelite_thebossim_herb_patch
         name: Herb
         icon: mdi:sprout
         tap_action:
@@ -407,7 +1511,7 @@ cards:
         secondary_info: none
         primary_info: name
       - type: custom:mushroom-entity-card
-        entity: sensor.runelite_%username_hespori_patch
+        entity: sensor.runelite_thebossim_hespori_patch
         name: Hespori
         icon: mdi:tree-outline
         tap_action:
@@ -417,7 +1521,7 @@ cards:
         secondary_info: none
         primary_info: name
       - type: custom:mushroom-entity-card
-        entity: sensor.runelite_%username_redwood_patch
+        entity: sensor.runelite_thebossim_redwood_patch
         name: Redwood
         icon: mdi:tree
         tap_action:
@@ -428,41 +1532,63 @@ cards:
         primary_info: name
   - type: horizontal-stack
     cards:
+      - type: custom:mushroom-entity-card
+        entity: sensor.runelite_thebossim_seaweed_patch
+        name: seaweed
+        icon: mdi:fish
+        tap_action:
+          action: call-service
+          service: runelite.seaweed_patch
+          data: {}
+        secondary_info: none
+        primary_info: name
+      - type: custom:mushroom-entity-card
+        entity: sensor.runelite_thebossim_birdhouses
+        name: Birdhouse
+        icon: mdi:bird
+        tap_action:
+          action: call-service
+          service: runelite.reset_birdhouses
+          data: {}
+        secondary_info: none
+        primary_info: name
+  - type: horizontal-stack
+    cards:
       - features:
           - type: custom:service-call
             entries:
               - type: dropdown
-                entity_id: sensor.runelite_%username_tree_patch
+                entity_id: sensor.runelite_thebossim_tree_patch
                 options:
-                  - entity_id: sensor.runelite_%username_tree_patch
+                  - entity_id: sensor.runelite_thebossim_tree_patch
                     label: Oak
                     tap_action:
                       action: perform-action
                       perform_action: runelite.tree_patch
                       data:
                         crop_type: oak
-                  - entity_id: sensor.runelite_%username_tree_patch
+                  - entity_id: sensor.runelite_thebossim_tree_patch
                     label: Willow
                     tap_action:
                       action: perform-action
                       perform_action: runelite.tree_patch
                       data:
                         crop_type: willow
-                  - entity_id: sensor.runelite_%username_tree_patch
+                  - entity_id: sensor.runelite_thebossim_tree_patch
                     label: Maple
                     tap_action:
                       action: perform-action
                       perform_action: runelite.tree_patch
                       data:
                         crop_type: maple
-                  - entity_id: sensor.runelite_%username_tree_patch
+                  - entity_id: sensor.runelite_thebossim_tree_patch
                     label: Yew
                     tap_action:
                       action: perform-action
                       perform_action: runelite.tree_patch
                       data:
                         crop_type: yew
-                  - entity_id: sensor.runelite_%username_tree_patch
+                  - entity_id: sensor.runelite_thebossim_tree_patch
                     label: Magic
                     tap_action:
                       action: perform-action
@@ -472,22 +1598,22 @@ cards:
         type: tile
         name: Tree
         icon: mdi:pine-tree
-        entity: sensor.runelite_%username_tree_patch
+        entity: sensor.runelite_thebossim_tree_patch
         hide_state: true
       - features:
           - type: custom:service-call
             entries:
               - type: dropdown
-                entity_id: sensor.runelite_%username_hardwood_patch
+                entity_id: sensor.runelite_thebossim_hardwood_patch
                 options:
-                  - entity_id: sensor.runelite_%username_hardwood_patch
+                  - entity_id: sensor.runelite_thebossim_hardwood_patch
                     label: Teak
                     tap_action:
                       action: perform-action
                       perform_action: runelite.hardwood_patch
                       data:
                         crop_type: teak
-                  - entity_id: sensor.runelite_%username_hardwood_patch
+                  - entity_id: sensor.runelite_thebossim_hardwood_patch
                     label: Mahogany
                     tap_action:
                       action: perform-action
@@ -497,22 +1623,14 @@ cards:
         type: tile
         name: Hardwood
         icon: mdi:pine-tree
-        entity: sensor.runelite_%username_hardwood_patch
+        entity: sensor.runelite_thebossim_hardwood_patch
         hide_state: true
-```
-
-
-For farming contracts:
-
-```yaml
-type: vertical-stack
-cards:
   - type: custom:mushroom-title-card
     title: Farming contract
   - type: horizontal-stack
     cards:
       - type: custom:mushroom-entity-card
-        entity: sensor.runelite_%username_herb_patch
+        entity: sensor.runelite_thebossim_herb_patch
         name: Herb
         icon: mdi:sprout
         tap_action:
@@ -522,7 +1640,7 @@ cards:
         secondary_info: none
         primary_info: name
       - type: custom:mushroom-entity-card
-        entity: sensor.runelite_%username_redwood_patch
+        entity: sensor.runelite_thebossim_redwood_patch
         name: Redwood
         icon: mdi:tree
         tap_action:
@@ -534,7 +1652,7 @@ cards:
   - type: horizontal-stack
     cards:
       - type: custom:mushroom-entity-card
-        entity: sensor.runelite_%username_flower_patch
+        entity: sensor.runelite_thebossim_flower_patch
         name: Flower
         icon: mdi:flower
         tap_action:
@@ -544,7 +1662,7 @@ cards:
         secondary_info: none
         primary_info: name
       - type: custom:mushroom-entity-card
-        entity: sensor.runelite_%username_fruit_tree_patch
+        entity: sensor.runelite_thebossim_fruit_tree_patch
         name: Fruit tree
         icon: mdi:food-apple
         tap_action:
@@ -556,7 +1674,7 @@ cards:
   - type: horizontal-stack
     cards:
       - type: custom:mushroom-entity-card
-        entity: sensor.runelite_%username_cactus_patch
+        entity: sensor.runelite_thebossim_cactus_patch
         name: Cactus
         icon: mdi:cactus
         tap_action:
@@ -566,7 +1684,7 @@ cards:
         secondary_info: none
         primary_info: name
       - type: custom:mushroom-entity-card
-        entity: sensor.runelite_%username_potato_cactus_patch
+        entity: sensor.runelite_thebossim_potato_cactus_patch
         name: Potato Cactus
         icon: mdi:cactus
         tap_action:
@@ -581,37 +1699,37 @@ cards:
           - type: custom:service-call
             entries:
               - type: dropdown
-                entity_id: sensor.runelite_%username_tree_patch
+                entity_id: sensor.runelite_thebossim_tree_patch
                 options:
-                  - entity_id: sensor.runelite_%username_tree_patch
+                  - entity_id: sensor.runelite_thebossim_tree_patch
                     label: Oak
                     tap_action:
                       action: perform-action
                       perform_action: runelite.farming_contract_tree
                       data:
                         crop_type: oak
-                  - entity_id: sensor.runelite_%username_tree_patch
+                  - entity_id: sensor.runelite_thebossim_tree_patch
                     label: Willow
                     tap_action:
                       action: perform-action
                       perform_action: runelite.farming_contract_tree
                       data:
                         crop_type: willow
-                  - entity_id: sensor.runelite_%username_tree_patch
+                  - entity_id: sensor.runelite_thebossim_tree_patch
                     label: Maple
                     tap_action:
                       action: perform-action
                       perform_action: runelite.farming_contract_tree
                       data:
                         crop_type: maple
-                  - entity_id: sensor.runelite_%username_tree_patch
+                  - entity_id: sensor.runelite_thebossim_tree_patch
                     label: Yew
                     tap_action:
                       action: perform-action
                       perform_action: runelite.farming_contract_tree
                       data:
                         crop_type: yew
-                  - entity_id: sensor.runelite_%username_tree_patch
+                  - entity_id: sensor.runelite_thebossim_tree_patch
                     label: Magic
                     tap_action:
                       action: perform-action
@@ -621,64 +1739,64 @@ cards:
         type: tile
         name: Tree
         icon: mdi:pine-tree
-        entity: sensor.runelite_%username_tree_patch
+        entity: sensor.runelite_thebossim_tree_patch
         hide_state: true
       - features:
           - type: custom:service-call
             entries:
               - type: dropdown
-                entity_id: sensor.runelite_%username_allotment_patch
+                entity_id: sensor.runelite_thebossim_allotment_patch
                 options:
-                  - entity_id: sensor.runelite_%username_allotment_patch
+                  - entity_id: sensor.runelite_thebossim_allotment_patch
                     label: Potato
                     tap_action:
                       action: perform-action
                       perform_action: runelite.farming_contract_allotment
                       data:
                         crop_type: potato
-                  - entity_id: sensor.runelite_%username_allotment_patch
+                  - entity_id: sensor.runelite_thebossim_allotment_patch
                     label: Onion
                     tap_action:
                       action: perform-action
                       perform_action: runelite.farming_contract_allotment
                       data:
                         crop_type: onion
-                  - entity_id: sensor.runelite_%username_allotment_patch
+                  - entity_id: sensor.runelite_thebossim_allotment_patch
                     label: Cabbage
                     tap_action:
                       action: perform-action
                       perform_action: runelite.farming_contract_allotment
                       data:
                         crop_type: cabbage
-                  - entity_id: sensor.runelite_%username_allotment_patch
+                  - entity_id: sensor.runelite_thebossim_allotment_patch
                     label: Tomato
                     tap_action:
                       action: perform-action
                       perform_action: runelite.farming_contract_allotment
                       data:
                         crop_type: tomato
-                  - entity_id: sensor.runelite_%username_allotment_patch
+                  - entity_id: sensor.runelite_thebossim_allotment_patch
                     label: Sweetcorn
                     tap_action:
                       action: perform-action
                       perform_action: runelite.farming_contract_allotment
                       data:
                         crop_type: sweetcorn
-                  - entity_id: sensor.runelite_%username_allotment_patch
+                  - entity_id: sensor.runelite_thebossim_allotment_patch
                     label: Strawberry
                     tap_action:
                       action: perform-action
                       perform_action: runelite.farming_contract_allotment
                       data:
                         crop_type: strawberry
-                  - entity_id: sensor.runelite_%username_allotment_patch
+                  - entity_id: sensor.runelite_thebossim_allotment_patch
                     label: Watermelon
                     tap_action:
                       action: perform-action
                       perform_action: runelite.farming_contract_allotment
                       data:
                         crop_type: watermelon
-                  - entity_id: sensor.runelite_%username_allotment_patch
+                  - entity_id: sensor.runelite_thebossim_allotment_patch
                     label: Snape Grass
                     tap_action:
                       action: perform-action
@@ -688,50 +1806,50 @@ cards:
         type: tile
         name: Allotment
         icon: mdi:grass
-        entity: sensor.runelite_%username_allotment_patch
+        entity: sensor.runelite_thebossim_allotment_patch
         hide_state: true
       - features:
           - type: custom:service-call
             entries:
               - type: dropdown
-                entity_id: sensor.runelite_%username_bush_patch
+                entity_id: sensor.runelite_thebossim_bush_patch
                 options:
-                  - entity_id: sensor.runelite_%username_bush_patch
+                  - entity_id: sensor.runelite_thebossim_bush_patch
                     label: Whiteberry
                     tap_action:
                       action: perform-action
                       perform_action: runelite.farming_contract_bush
                       data:
                         crop_type: whiteberry
-                  - entity_id: sensor.runelite_%username_bush_patch
+                  - entity_id: sensor.runelite_thebossim_bush_patch
                     label: Poison Ivy
                     tap_action:
                       action: perform-action
                       perform_action: runelite.farming_contract_bush
                       data:
                         crop_type: poison_ivy
-                  - entity_id: sensor.runelite_%username_bush_patch
+                  - entity_id: sensor.runelite_thebossim_bush_patch
                     label: Jangerberry
                     tap_action:
                       action: perform-action
                       perform_action: runelite.farming_contract_bush
                       data:
                         crop_type: jangerberry
-                  - entity_id: sensor.runelite_%username_bush_patch
+                  - entity_id: sensor.runelite_thebossim_bush_patch
                     label: Redberry
                     tap_action:
                       action: perform-action
                       perform_action: runelite.farming_contract_bush
                       data:
                         crop_type: redberry
-                  - entity_id: sensor.runelite_%username_bush_patch
+                  - entity_id: sensor.runelite_thebossim_bush_patch
                     label: Cadavaberry
                     tap_action:
                       action: perform-action
                       perform_action: runelite.farming_contract_bush
                       data:
                         crop_type: cadavaberry
-                  - entity_id: sensor.runelite_%username_bush_patch
+                  - entity_id: sensor.runelite_thebossim_bush_patch
                     label: Dwellberry
                     tap_action:
                       action: perform-action
@@ -741,6 +1859,7 @@ cards:
         type: tile
         name: Bush
         icon: mdi:spa
-        entity: sensor.runelite_%username_bush_patch
+        entity: sensor.runelite_thebossim_bush_patch
         hide_state: true
+
 ```
