@@ -183,7 +183,6 @@ It contains an attribute `current_status_effects`, which contains the following 
 - `number`  Right now represents the damage number. But in the future for skill boosts for example, it will be the boost so could be below 0 as well.
 - `time`    Is not yet used, in the future I want to add a calculation to estimate the time for some of them
 
-
 #### Example yaml to show them in a list on your dashboard
 
 ```yaml
@@ -197,6 +196,22 @@ content: >
 
   {% endfor %}
 ```
+
+### Aggression timer
+
+Player aggression timer, logic is the same as the internal runelite aggression timer plugin.
+
+The ID of the entity will be `sensor.runelite_%username_aggression`
+
+And it has these attributes:
+
+- `status`: current status, also it's state, one of these values: `unknown`, `active`, `safe`
+- `seconds`: current amount of seconds left
+- `ticks`: current amount of ticks left
+
+<br>
+
+<strong>[Still in update progress for the runelite plugin](#current-updates-in-progress-for-the-runelite-plugin)</strong>
 
 
 ## Services (actions)
@@ -281,7 +296,13 @@ The services will be called: `daily_done_%activity%`
 
 The update process for runelite plugins are a lot more delayed because of the understandable review progress. 
 
-Right now everything is up to date!
+Current updates in progress:
+
+- Support for aggression timer
+
+Pull request for these changes:
+
+https://github.com/runelite/plugin-hub/pull/8312
 
 ## Examples
 

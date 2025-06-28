@@ -23,6 +23,7 @@ from .sensors.contract import FarmingContractSensor
 from .sensors.birdhouses import BirdhousesSensor
 from .sensors.farming_tick import FarmingTickOffsetSensor
 from .sensors.compost_bin import CompostBinSensor
+from .sensors.aggression import AgressionSensor
 from .helpers import sanitize
 
 DOMAIN = "runelite"
@@ -125,6 +126,9 @@ async def async_setup_entry(
 
     player_status_entity = PlayerStatus(username)
     entities.append(player_status_entity)
+
+    aggression_entity = AgressionSensor(username)
+    entities.append(aggression_entity)
 
     async_add_entities(entities)
 

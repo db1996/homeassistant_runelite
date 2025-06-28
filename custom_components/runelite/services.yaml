@@ -144,6 +144,22 @@ set_entity_data:
         number:
           min: 0
           max: 100
+    seconds:
+      required: false
+      name: Current seconds (used for aggression timer)
+      description: The current seconds of the player aggression timer (0-20000).
+      selector:
+        number:
+          min: 0
+          max: 20000
+    ticks:
+      required: false
+      name: Current ticks (used for aggression timer)
+      description: The current ticks of the player aggression timer (0-20000).
+      selector:
+        number:
+          min: 0
+          max: 20000
     current_special_attack:
       required: false
       name: Current Special Attack

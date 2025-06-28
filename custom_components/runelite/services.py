@@ -1,6 +1,7 @@
 """Services for the RuneLite Farming integration."""
 
 import logging
+from custom_components.runelite.sensors.aggression import AgressionSensor
 from custom_components.runelite.sensors.player_health import PlayerHealth
 from custom_components.runelite.sensors.player_prayer import PlayerPrayer
 from custom_components.runelite.sensors.player_run_energy import PlayerRunEnergy
@@ -44,6 +45,8 @@ SET_ENTITY_DATA_SCHEMA = vol.Schema(
         vol.Optional("current_prayer"): vol.All(int, vol.Range(min=0, max=99)),
         vol.Optional("current_run_energy"): vol.All(int, vol.Range(min=0, max=100)),
         vol.Optional("current_special_attack"): vol.All(int, vol.Range(min=0, max=100)),
+        vol.Optional("seconds"): vol.All(int, vol.Range(min=0, max=20000)),
+        vol.Optional("ticks"): vol.All(int, vol.Range(min=0, max=20000)),
         vol.Optional("is_online"): cv.boolean,
         vol.Optional("world"): cv.string,
         vol.Optional("virtual_level"): vol.All(int, vol.Range(min=-100, max=200)),
@@ -262,7 +265,7 @@ class RuneLiteFarmingServices:
             sensor_entity = entry_data.get("entities", {}).get(entity_id)
             # get instance of the sensor entity
             if isinstance(sensor_entity, (FarmingPatchTypeSensor, FarmingContractSensor, FarmingTickOffsetSensor, BirdhousesSensor, DailySensor, OsrsActivitySensor, OsrsSkillSensor, CompostBinSensor,
-                                          PlayerRunEnergy, PlayerHealth, PlayerPrayer, PlayerSpecialAttack, PlayerStatusEffects, PlayerStatus, OsrsSkillSensor)):
+                                          PlayerRunEnergy, PlayerHealth, PlayerPrayer, PlayerSpecialAttack, PlayerStatusEffects, PlayerStatus, OsrsSkillSensor, AgressionSensor)):
                 _LOGGER.debug(f"Updating entity '{entity_id}' with data: {data}")
                 await sensor_entity.update_data(data)
                 return
