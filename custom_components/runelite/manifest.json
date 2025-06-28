@@ -11,5 +11,5 @@
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/db1996/homeassistant_runelite/issues",
   "requirements": [],
-  "version": "2025.06.6"
+  "version": "2025.06.7"
 }

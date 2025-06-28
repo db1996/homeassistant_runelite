@@ -163,10 +163,6 @@ Supported daily activities right now:
 - Arrows
 - Dynamite
 
-<br>
-
-<strong>[Still in update progress for the runelite plugin](#current-updates-in-progress-for-the-runelite-plugin)</strong>
-
 ### Player stats
 
 Player health, prayer, special attack and run energy
@@ -175,10 +171,6 @@ The ID of the entity will be `sensor.runelite_%username_%stat`
 
 The state will be the number, and it has an attribute: `current_health`, `current_prayer`, `current_special_attack` or `current_run_energy`
 those can be used for automations as well.
-
-<br>
-
-<strong>[Still in update progress for the runelite plugin](#current-updates-in-progress-for-the-runelite-plugin)</strong>
 
 ### Player status effects
 
@@ -190,10 +182,6 @@ It contains an attribute `current_status_effects`, which contains the following 
 - `name`    Name of the effect, for now limited to `Poison` or `Venom`
 - `number`  Right now represents the damage number. But in the future for skill boosts for example, it will be the boost so could be below 0 as well.
 - `time`    Is not yet used, in the future I want to add a calculation to estimate the time for some of them
-
-<br>
-
-<strong>[Still in update progress for the runelite plugin](#current-updates-in-progress-for-the-runelite-plugin)</strong>
 
 
 #### Example yaml to show them in a list on your dashboard
@@ -293,16 +281,7 @@ The services will be called: `daily_done_%activity%`
 
 The update process for runelite plugins are a lot more delayed because of the understandable review progress. 
 
-Current pull request: https://github.com/runelite/plugin-hub/pull/8207
-
-Updates in the waiting list
-
-- Support for dailies
-- Support for player stats
-- Bugfixes
-- Improved settings, no longer individual farming patches but general things.
-  - New player stats are turned off by default, they will result in lots of calls to HA, especially the run energy. I have not experienced slowdowns myself but let me know if I need to add delays to it, or a setting for that.
-
+Right now everything is up to date!
 
 ## Examples
 
