@@ -781,3 +781,31 @@ trigger_collection_log_notify:
       description: The name of the item to notify about.
       selector:
         text:
+
+trigger_combat_task_notify:
+  name: Combat Task Notify
+  description: Notifies about a newly completed combat task.
+  fields:
+    task_name:
+      required: true
+      name: Name of the completed combat task
+      description: The name of the task to notify about.
+      selector:
+        text:
+
+trigger_achievement_diary_notify:
+  name: Achievement Diary Notify
+  description: Notifies about a newly completed achievement diary task.
+  fields:
+    task_name:
+      required: true
+      name: Name of the completed achievement diary task
+      description: The name of the task to notify about.
+      selector:
+        text:
+    tier:
+      required: true
+      name: Tier of the completed achievement diary task
+      description: The tier of the task to notify about.
+      selector:
+        text:

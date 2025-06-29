@@ -232,6 +232,26 @@ class RuneLiteFarmingServices:
             schema=COLLECTION_LOG_NOTIFY_SCHEMA,
         )
 
+        self.hass.services.async_register(
+            DOMAIN,
+            "trigger_combat_task_notify",
+            self.async_combat_task_notify_service,
+            schema=vol.Schema({
+                vol.Required("task_name"): cv.string,
+                vol.Optional("tier"): cv.string,  # Optional tier, defaults to "unknown"
+            }),
+        )
+
+        self.hass.services.async_register(
+            DOMAIN,
+            "trigger_achievement_diary_notify",
+            self.async_achievement_diary_notify_service,
+            schema=vol.Schema({
+                vol.Required("task_name"): cv.string,
+                vol.Required("tier"): cv.string,
+            }),
+        )
+
     def get_default_username(self) -> str:
         """Get the default username from the config entry."""
         return self.config_entry.data.get("username", "").replace(" ", "_").lower()
@@ -437,7 +457,32 @@ class RuneLiteFarmingServices:
             }
         )
 
-                
+    async def async_combat_task_notify_service(self, service: ServiceCall) -> None:
+        task_name = service.data["task_name"]
+        tier = service.data.get("tier", "unknown")
+        _LOGGER.info(f"Firing combat_task_notify event for task: {task_name}")
+
+        self.hass.bus.async_fire(
+            f"{DOMAIN}_combat_task_notify",  # results in event like "runelite_combat_task_notify"
+            {
+                "task_name": task_name,
+                "tier": tier,
+            }
+        )
+
+        
+    async def async_achievement_diary_notify_service(self, service: ServiceCall) -> None:
+        task_name = service.data["task_name"]
+        tier = service.data.get("tier")
+        _LOGGER.info(f"Firing achievement_diary_notify event for task: {task_name}")
+
+        self.hass.bus.async_fire(
+            f"{DOMAIN}_achievement_diary_notify",  # results in event like "runelite_achievement_diary_notify"
+            {
+                "task_name": task_name,
+                "tier": tier, 
+            }
+        )
 
     async def async_refetch_osrs_highscores(self, service: ServiceCall) -> None:
         """Reset the birdhouses."""

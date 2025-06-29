@@ -26,7 +26,9 @@ Table of contents
     - [Player status effects](#player-status-effects)
     - [Aggression timer](#aggression-timer)
   - [Events (triggers)](#events-triggers)
-    - [runelite\_collection\_log\_notify](#runelite_collection_log_notify)
+    - [Collection Log Notify](#collection-log-notify)
+    - [Achievement diary Notify](#achievement-diary-notify)
+    - [Combat Task notify](#combat-task-notify)
   - [Services (actions)](#services-actions)
     - [set\_farming\_tick\_offset](#set_farming_tick_offset)
     - [reset\_birdhouses](#reset_birdhouses)
@@ -39,6 +41,8 @@ Table of contents
     - [Farming contracts](#farming-contracts)
     - [Daily tasks](#daily-tasks)
     - [Trigger collection log notify](#trigger-collection-log-notify)
+    - [Trigger achievement diary notify](#trigger-achievement-diary-notify)
+    - [Trigger combat task notify](#trigger-combat-task-notify)
   - [Current updates in progress for the runelite plugin](#current-updates-in-progress-for-the-runelite-plugin)
   - [Examples](#examples)
     - [Skills overview, current player status and online status](#skills-overview-current-player-status-and-online-status)
@@ -245,7 +249,7 @@ And it has these attributes:
 When playing with the runelite plugin active, it can send events you can use as triggers in automations. 
 
 
-### runelite_collection_log_notify
+### Collection Log Notify
 
 Has to be turned on in the runelite plugin settings. Will trigger when a collection log slot is unlocked.
 
@@ -259,6 +263,39 @@ Check out the [example automation here](#trigger-for-runelite-event-example)
 <strong>[Still in update progress for the runelite plugin](#current-updates-in-progress-for-the-runelite-plugin)</strong>
 
 But you can trigger this yourself by calling the service [calling the service](#trigger-collection-log-notify)
+
+
+### Achievement diary Notify
+
+Has to be turned on in the runelite plugin settings. Will trigger when an achievement diary task is completed
+
+Contains the following data attributes:
+
+- `task_name`: Name of the region
+- `tier`: Tier of the diary
+<br>
+
+Check out the [example automation here](#trigger-for-runelite-event-example)
+
+<strong>[Still in update progress for the runelite plugin](#current-updates-in-progress-for-the-runelite-plugin)</strong>
+
+But you can trigger this yourself by calling the service [calling the service](#trigger-achievement-diary-notify)
+
+### Combat Task notify
+
+Has to be turned on in the runelite plugin settings. Will trigger when an achievement diary task is completed
+
+Contains the following data attributes:
+
+- `task_name`: Name of the task
+- `tier`: Tier of the diary
+<br>
+
+Check out the [example automation here](#trigger-for-runelite-event-example)
+
+<strong>[Still in update progress for the runelite plugin](#current-updates-in-progress-for-the-runelite-plugin)</strong>
+
+But you can trigger this yourself by calling the service [calling the service](#trigger-combat-task-notify)
 
 ## Services (actions)
 
@@ -343,9 +380,28 @@ You can call this service to test the collection log event. This is also the exa
 
 The services is called: `runelite.trigger_collection_log_notify`
 
+
+### Trigger achievement diary notify
+
+You can call this service to test the achievemtnt diary event. This is also the exact service runelite calls when it is detected.
+
+The services is called: `runelite.trigger_achievement_diary_notify`
+
 |**Inputs**|Info|
 |----|----|
-|item_name|Name of the unlocked item
+|task_name|Region of the diary
+|tier|Tier of the task
+
+### Trigger combat task notify
+
+You can call this service to test the combat task event. This is also the exact service runelite calls when it is detected.
+
+The services is called: `runelite.trigger_combat_task_notify`
+
+|**Inputs**|Info|
+|----|----|
+|task_name|Name of the completed task|
+|tier|Tier of the task
 
 ## Current updates in progress for the runelite plugin
 
@@ -356,6 +412,8 @@ Current updates in progress:
 - Support for aggression timer
 - All skill boosts (virtual levels)
 - Collection log event
+- Achievement diary event
+- Combat task event
 
 Pull request for these changes:
 
