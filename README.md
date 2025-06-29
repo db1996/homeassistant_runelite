@@ -9,6 +9,45 @@ It also supports dailies like battlestaves, sand etc.
 
 It now also supports live player status: Health, prayer, run energy, special attack, online/offline and which world.
 
+Table of contents
+- [Runelite OSRS](#runelite-osrs)
+  - [Installation](#installation)
+    - [Via HACS](#via-hacs)
+    - [Manual Installation](#manual-installation)
+  - [Configuration](#configuration)
+    - [Add Integration](#add-integration)
+    - [Accompanying runelite plugin](#accompanying-runelite-plugin)
+  - [Entities](#entities)
+    - [Farming / Birdhouses](#farming--birdhouses)
+    - [Skills](#skills)
+    - [Activities](#activities)
+    - [Dailies](#dailies)
+    - [Player stats](#player-stats)
+    - [Player status effects](#player-status-effects)
+    - [Aggression timer](#aggression-timer)
+  - [Events (triggers)](#events-triggers)
+    - [runelite\_collection\_log\_notify](#runelite_collection_log_notify)
+  - [Services (actions)](#services-actions)
+    - [set\_farming\_tick\_offset](#set_farming_tick_offset)
+    - [reset\_birdhouses](#reset_birdhouses)
+    - [reset\_big\_compost](#reset_big_compost)
+    - [reset\_all\_dailies](#reset_all_dailies)
+    - [calculate\_patch\_or\_crop](#calculate_patch_or_crop)
+    - [calculate\_farming\_contract](#calculate_farming_contract)
+    - [Shortcut services](#shortcut-services)
+    - [Patches](#patches)
+    - [Farming contracts](#farming-contracts)
+    - [Daily tasks](#daily-tasks)
+    - [Trigger collection log notify](#trigger-collection-log-notify)
+  - [Current updates in progress for the runelite plugin](#current-updates-in-progress-for-the-runelite-plugin)
+  - [Examples](#examples)
+    - [Skills overview, current player status and online status](#skills-overview-current-player-status-and-online-status)
+    - [Current player status (health, prayer, spec, run energy, online/world)](#current-player-status-health-prayer-spec-run-energy-onlineworld)
+    - [Trigger for runelite event example](#trigger-for-runelite-event-example)
+    - [Dashboard farming overview example](#dashboard-farming-overview-example)
+    - [Dashboard for calculating patches and contracts](#dashboard-for-calculating-patches-and-contracts)
+
+
 ## Installation
 
 ### Via HACS
@@ -127,10 +166,12 @@ It has the following _attributes:
 
 `Rank` Rank on the highscores<br>
 `Level` Currrent level<br>
-`virtual_level` Currrent skill boost, this is for future proofing, will add functionality in the runelite plugin later to update these automatically<br>
+`virtual_level` Currrent skill boost, this is for future proofing, gets updated automatically from the runelite plugin<br>
 `Xp` Current XP
 
 The skills automatically update every 6 hours from the OSRS highscores. There is a service to refetch.
+
+<strong>[virtual_level automatic update still in progress for the runelite plugin](#current-updates-in-progress-for-the-runelite-plugin)</strong>
 
 ### Activities
 
@@ -183,20 +224,6 @@ It contains an attribute `current_status_effects`, which contains the following 
 - `number`  Right now represents the damage number. But in the future for skill boosts for example, it will be the boost so could be below 0 as well.
 - `time`    Is not yet used, in the future I want to add a calculation to estimate the time for some of them
 
-#### Example yaml to show them in a list on your dashboard
-
-```yaml
-type: markdown
-title: Status Effects
-content: >
-  {% for effect in state_attr('sensor.runelite_%username_status_effects',
-  'current_status_effects') %}
-
-  - **{{ effect.name | capitalize }}**: {{ effect.number }}
-
-  {% endfor %}
-```
-
 ### Aggression timer
 
 Player aggression timer, logic is the same as the internal runelite aggression timer plugin.
@@ -213,6 +240,22 @@ And it has these attributes:
 
 <strong>[Still in update progress for the runelite plugin](#current-updates-in-progress-for-the-runelite-plugin)</strong>
 
+## Events (triggers)
+
+When playing with the runelite plugin active, it can send events you can use as triggers in automations. 
+
+
+### runelite_collection_log_notify
+
+Has to be turned on in the runelite plugin settings. Will trigger when a collection log slot is unlocked.
+
+Contains the following data attributes:
+
+- `item_name`: Name of the unlocked item
+<br>
+
+
+<strong>[Still in update progress for the runelite plugin](#current-updates-in-progress-for-the-runelite-plugin)</strong>
 
 ## Services (actions)
 
@@ -291,6 +334,15 @@ Each farming contract crop type has it's own service. For example `farming_contr
 Each daily task has it's own reset/done service. Reset to set it back to 0 (incomplete), done to set it to 1 (complete)
 The services will be called: `daily_done_%activity%`
 
+### Trigger collection log notify
+
+You can call this service to test the collection log event. This is also the exact service runelite calls when it is detected.
+
+The services is called: `runelite.trigger_collection_log_notify`
+
+|**Inputs**|Info|
+|----|----|
+|item_name|Name of the unlocked item
 
 ## Current updates in progress for the runelite plugin
 
@@ -299,6 +351,8 @@ The update process for runelite plugins are a lot more delayed because of the un
 Current updates in progress:
 
 - Support for aggression timer
+- All skill boosts (virtual levels)
+- Collection log event
 
 Pull request for these changes:
 
@@ -1403,6 +1457,24 @@ cards:
         - width: 80px
         - padding: 6px 6px
         - position: relative
+```
+
+### Trigger for runelite event example
+
+Below is the example for the collection log notify. Any event listed above can be used instead of `runelite_collection_log_notify`, any of the data attributes can be accesed like `trigger.event.data.item_name`
+
+``` yaml
+alias: Collection Log Notify
+description: ""
+triggers:
+  - event_type: runelite_collection_log_notify
+    trigger: event
+actions:
+  - action: notify.mobile_phone
+    metadata: {}
+    data:
+      message: "{{ trigger.event.data.item_name }}"
+      title: Collection log unlocked
 ```
 
 ### Dashboard farming overview example
