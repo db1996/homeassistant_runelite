@@ -771,3 +771,13 @@ daily_done_dynamite:
       selector:
         text:
 
+trigger_collection_log_notify:
+  name: Collection Log Notify
+  description: Notifies about a newly unlocked item in the collection log.
+  fields:
+    item_name:
+      required: true
+      name: Name of the unlocked item
+      description: The name of the item to notify about.
+      selector:
+        text:

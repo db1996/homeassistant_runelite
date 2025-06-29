@@ -24,6 +24,8 @@ _LOGGER = logging.getLogger(__name__)
 AVAILABLE_PATCH_TYPES = list(PATCH_TYPE_DATA.keys())
 AVAILABLE_CROP_TYPES = list(CROP_TYPE_DATA.keys())
 
+
+
 # Define the input schema for the set_patch_completion service
 SET_ENTITY_DATA_SCHEMA = vol.Schema(
     {
@@ -52,6 +54,10 @@ SET_ENTITY_DATA_SCHEMA = vol.Schema(
         vol.Optional("virtual_level"): vol.All(int, vol.Range(min=-100, max=200)),
     }
 )
+
+COLLECTION_LOG_NOTIFY_SCHEMA = vol.Schema({
+    vol.Required("item_name"): cv.string,
+})
 
 SET_MULTI_ENTITY_DATA_SCHEMA = vol.Schema(
     {
@@ -217,6 +223,13 @@ class RuneLiteFarmingServices:
             "reset_all_dailies",
             self.async_reset_all_dailies_services, 
             schema=SET_PATCH_DIRECTLY_SCHEMA,
+        )
+
+        self.hass.services.async_register(
+            DOMAIN,
+            "trigger_collection_log_notify",
+            self.async_collection_log_notify_service,
+            schema=COLLECTION_LOG_NOTIFY_SCHEMA,
         )
 
     def get_default_username(self) -> str:
@@ -412,6 +425,17 @@ class RuneLiteFarmingServices:
                     await sensor_entity.update_data(update_data)
                 else:
                     _LOGGER.warning(f"Daily sensor '{entity_id}' not found for {username}.")
+
+    async def async_collection_log_notify_service(self, service: ServiceCall) -> None:
+        item_name = service.data["item_name"]
+        _LOGGER.info(f"Firing collection_log_notify event for item: {item_name}")
+        
+        self.hass.bus.async_fire(
+            f"{DOMAIN}_collection_log_notify",  # results in event like "runelite_collection_log_notify"
+            {
+                "item_name": item_name,
+            }
+        )
 
                 
 
