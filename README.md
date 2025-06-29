@@ -254,6 +254,8 @@ Contains the following data attributes:
 - `item_name`: Name of the unlocked item
 <br>
 
+Check out the [example automation here](#trigger-for-runelite-event-example)
+
 <strong>[Still in update progress for the runelite plugin](#current-updates-in-progress-for-the-runelite-plugin)</strong>
 
 But you can trigger this yourself by calling the service [calling the service](#trigger-collection-log-notify)
