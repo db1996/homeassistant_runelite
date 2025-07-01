@@ -809,3 +809,20 @@ trigger_achievement_diary_notify:
       description: The tier of the task to notify about.
       selector:
         text:
+
+trigger_varbit_change_notify:
+  name: Varbit Change Notify
+  description: Notifies about a change in a varbit value.
+  fields:
+    varbit_id:
+      required: true
+      name: Varbit ID
+      description: The ID of the varbit to notify about.
+      selector:
+        number:
+    value:
+      required: true
+      name: Value
+      description: The new value of the varbit to notify about.
+      selector:
+        number:

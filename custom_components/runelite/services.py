@@ -252,6 +252,16 @@ class RuneLiteFarmingServices:
             }),
         )
 
+        self.hass.services.async_register(
+            DOMAIN,
+            "trigger_varbit_change_notify",
+            self.async_varbit_change_service,
+            schema=vol.Schema({
+                vol.Required("varbit_id"): int,
+                vol.Required("value"): int,
+            }),
+        )
+
     def get_default_username(self) -> str:
         """Get the default username from the config entry."""
         return self.config_entry.data.get("username", "").replace(" ", "_").lower()
@@ -481,6 +491,19 @@ class RuneLiteFarmingServices:
             {
                 "task_name": task_name,
                 "tier": tier, 
+            }
+        )
+
+    async def async_varbit_change_service(self, service: ServiceCall) -> None:
+        varbit_id = service.data["varbit_id"]
+        value = service.data.get("value")
+        _LOGGER.info(f"Firing varbit_change_notify event for varbit: {varbit_id}")
+
+        self.hass.bus.async_fire(
+            f"{DOMAIN}_varbit_change_notify",  # results in event like "runelite_varbit_change"
+            {
+                "varbit_id": varbit_id,
+                "value": value,
             }
         )
 
