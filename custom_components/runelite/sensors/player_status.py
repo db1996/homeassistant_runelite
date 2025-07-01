@@ -2,6 +2,8 @@ from homeassistant.components.sensor import SensorEntity
 from homeassistant.helpers.restore_state import RestoreEntity
 import logging
 from ..helpers import sanitize
+from custom_components.runelite.const import DOMAIN
+from homeassistant.helpers.entity import DeviceInfo
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -18,6 +20,16 @@ class PlayerStatus(SensorEntity, RestoreEntity):
     @property
     def state(self):
         return self._is_online
+    
+    @property
+    def device_info(self) -> DeviceInfo:
+        return DeviceInfo(
+            identifiers={(DOMAIN, sanitize(self._username))},
+            name=f"RuneLite ({self._username})",
+            manufacturer="RuneLite",
+            model="Old School RuneScape",
+            entry_type=None,  # Could be "service" or "gateway", but None is fine for a player
+        )
     
     @property
     def extra_state_attributes(self):
