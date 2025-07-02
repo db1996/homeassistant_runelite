@@ -10,7 +10,6 @@ from custom_components.runelite.sensors.player_status import PlayerStatus
 from custom_components.runelite.sensors.player_status_effects import PlayerStatusEffects
 from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers import config_validation as cv
 from .sensor import FarmingPatchTypeSensor, FarmingContractSensor, FarmingTickOffsetSensor, BirdhousesSensor, DailySensor, OsrsActivitySensor, OsrsSkillSensor, CompostBinSensor  # Import your sensor class if needed
 from datetime import datetime, timedelta, timezone
@@ -258,8 +257,15 @@ class RuneLiteFarmingServices:
             self.async_varbit_change_service,
             schema=vol.Schema({
                 vol.Required("varbit_id"): int,
-                vol.Required("value"): int,
+                vol.Required("old_value"): int,
+                vol.Required("new_value"): int,
             }),
+        )
+
+        self.hass.services.async_register(
+            DOMAIN,
+            "trigger_idle_notify",
+            self.async_idle_notify_service,
         )
 
     def get_default_username(self) -> str:
@@ -496,15 +502,24 @@ class RuneLiteFarmingServices:
 
     async def async_varbit_change_service(self, service: ServiceCall) -> None:
         varbit_id = service.data["varbit_id"]
-        value = service.data.get("value")
+        old_value = service.data.get("old_value")
+        new_value = service.data.get("new_value")
         _LOGGER.info(f"Firing varbit_change_notify event for varbit: {varbit_id}")
 
         self.hass.bus.async_fire(
             f"{DOMAIN}_varbit_change_notify",  # results in event like "runelite_varbit_change"
             {
                 "varbit_id": varbit_id,
-                "value": value,
+                "old_value": old_value,
+                "new_value": new_value,
             }
+        )
+
+    async def async_idle_notify_service(self, service: ServiceCall) -> None:
+        _LOGGER.info("Firing player idle notify event")
+
+        self.hass.bus.async_fire(
+            f"{DOMAIN}_idle_notify"
         )
 
     async def async_refetch_osrs_highscores(self, service: ServiceCall) -> None:

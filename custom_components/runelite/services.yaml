@@ -820,9 +820,19 @@ trigger_varbit_change_notify:
       description: The ID of the varbit to notify about.
       selector:
         number:
-    value:
+    new_value:
       required: true
-      name: Value
+      name: New value
       description: The new value of the varbit to notify about.
       selector:
         number:
+    old_value:
+      required: true
+      name: Old value
+      description: The old value of the varbit to notify about.
+      selector:
+        number:
+
+trigger_idle_notify:
+  name: Idle Notify
+  description: Notifies player as idle.

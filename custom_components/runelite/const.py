@@ -1,5 +1,6 @@
 """Constants for the Runelite integration."""
 
+PLAYER_LOGOUT_TIME = 120  # seconds
 NAME = "runelite"
 DOMAIN = "runelite"
 SENSOR_PREFIX = "runelite "

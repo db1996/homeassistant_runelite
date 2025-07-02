@@ -25,6 +25,9 @@ Table of contents
     - [Collection Log Notify](#collection-log-notify)
     - [Achievement diary Notify](#achievement-diary-notify)
     - [Combat Task notify](#combat-task-notify)
+    - [Combat Task notify](#combat-task-notify-1)
+    - [Varbit change notify](#varbit-change-notify)
+    - [Idle notify](#idle-notify)
   - [Services (actions)](#services-actions)
     - [set\_farming\_tick\_offset](#set_farming_tick_offset)
     - [reset\_birdhouses](#reset_birdhouses)
@@ -39,7 +42,9 @@ Table of contents
     - [Trigger collection log notify](#trigger-collection-log-notify)
     - [Trigger achievement diary notify](#trigger-achievement-diary-notify)
     - [Trigger combat task notify](#trigger-combat-task-notify)
-  - [Current updates in progress for the runelite plugin: live](#current-updates-in-progress-for-the-runelite-plugin-live)
+    - [Trigger idle notify](#trigger-idle-notify)
+    - [Trigger varbit change notify](#trigger-varbit-change-notify)
+  - [Current updates in progress for the runelite plugin:](#current-updates-in-progress-for-the-runelite-plugin)
   - [Examples](#examples)
     - [Skills overview example](#skills-overview-example)
     - [Current player stats (health etc)](#current-player-stats-health-etc)
@@ -237,6 +242,8 @@ And it has these attributes:
 
 When playing with the runelite plugin active, it can send events you can use as triggers in automations. 
 
+Check out the [example automation here](docs/event_triggers-example.md)
+
 ### Collection Log Notify
 
 `runelite_collection_log_notify`
@@ -281,6 +288,54 @@ Contains the following data attributes:
 Check out the [example automation here](docs/event_triggers-example.md)
 
 You can trigger this yourself by calling the service [calling the service](#trigger-combat-task-notify)
+
+
+### Combat Task notify
+
+`runelite_combat_task_notify`
+
+Has to be turned on in the runelite plugin settings. Will trigger when an achievement diary task is completed
+
+Contains the following data attributes:
+
+- `task_name`: Name of the task
+- `tier`: Tier of the diary
+
+Check out the [example automation here](docs/event_triggers-example.md)
+
+You can trigger this yourself by calling the service [calling the service](#trigger-combat-task-notify)
+
+### Varbit change notify
+
+`runelite_varbit_change_notify`
+
+This one is a bit more complicated, but this one enables you to react to so many configurable events in OSRS. In the plugin, a new config field is added under events called "Watch VarBit ID". You can enter custom VarBit ID's here comma seperated.
+
+[Here is the link to the client file](https://github.com/runelite/runelite/blob/master/runelite-api/src/main/java/net/runelite/api/gameval/VarbitID.java) where all available VarBits are defined.
+
+As an example, on line 208 the following is defined: `public static final int AUTOCAST_SPELL = 276;`. If you enter `276` in the runelite plugin settings field. Any time you change your autocast spell will receive an event on `runelite_varbit_change_notify` in homeassistant. With the old spell value and the new spell value.
+
+Contains the following data attributes:
+
+- `varbit_id`: VarBit ID from runelite
+- `old_value`: Old value of the varbit
+- `new_value`: New value of the varbit
+
+Check out the [example automation here](docs/event_triggers-example.md)
+
+You can trigger this yourself by calling the service [calling the service](#trigger-varbit-change-notify)
+
+### Idle notify
+
+`runelite_idle_notify`
+
+Runelite triggers this when you have been idle for x amount of ticks, configurable in the settings.
+
+Contains **no** attributes
+
+Check out the [example automation here](docs/event_triggers-example.md)
+
+You can trigger this yourself by calling the service [calling the service](#trigger-idle-notify)
 
 ## Services (actions)
 
@@ -388,9 +443,35 @@ The services is called: `runelite.trigger_combat_task_notify`
 |task_name|Name of the completed task|
 |tier|Tier of the task
 
-## Current updates in progress for the runelite plugin: live
+### Trigger idle notify
 
-The latest updates are all live in runelite right now!
+You can call this service to test the idle notify event. This is also the exact service runelite calls when it is detected.
+
+The services is called: `runelite.trigger_idle_notify`
+
+**Contains no inputs**
+
+This is still in update progress in runelite, [check here](#current-updates-in-progress-for-the-runelite-plugin) to view all updates still pending
+
+### Trigger varbit change notify
+
+You can call this service to test the varbit change event. This is also the exact service runelite calls when it is detected.
+
+The services is called: `runelite.trigger_varbit_change_notify`
+
+|**Inputs**|Info|
+|----|----|
+|varbit_id|VarBit ID
+|new_value|New value
+|old_value|Old value
+
+## Current updates in progress for the runelite plugin:
+
+Runelite plugins take a bit longer to update. These updates (that are ready on the homeassistant side) are still pending in the plugin.
+
+- Idle notify
+- Varbit Notify
+- Login status pings every minute to keep the status active from runelite
 
 ## Examples
 

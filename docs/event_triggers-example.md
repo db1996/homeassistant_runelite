@@ -1,6 +1,6 @@
 # Trigger for runelite event example
 
-Below is the example for the collection log notify. Any event listed here [text](../README.md#events-triggers) can be used instead of `runelite_collection_log_notify`, 
+Below is the example for the collection log notify. Any event listed [here](../README.md#events-triggers) can be used instead of `runelite_collection_log_notify`, 
 
 any of the data attributes can be accesed like `trigger.event.data.item_name`
 

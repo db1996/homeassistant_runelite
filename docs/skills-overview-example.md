@@ -940,4 +940,45 @@ cards:
             </div>
           `;
         ]]]
+  - type: custom:button-card
+    entity: sensor.runelite_nor_pker_skill_total
+    show_state: false
+    show_name: false
+    show_icon: false
+    styles:
+      custom_fields:
+        info:
+          - justify-self: end
+          - align-self: end
+      card:
+        - background-image: |-
+            [[[
+              const skillName = entity.attributes.name?.replace(/\s+/g, '_') ?? 'Unknown';
+              return `url('https://oldschool.runescape.wiki/images/${skillName}_icon_%28detail%29.png')`;
+            ]]]
+        - background-size: 30px 30px
+        - background-repeat: no-repeat
+        - background-position: 6px center
+        - background-color: "#1e1e1e"
+        - border-radius: 10px
+        - height: 40px
+        - width: 80px
+        - padding-left: 10px
+        - position: relative
+    custom_fields:
+      info: |
+        [[[
+          const level = entity.attributes.level ?? 'N/A';
+          return `
+            <div style="position: absolute; right: 6px; bottom: 6px; text-align: right; font-size: 11px; line-height: 12px; color: white; text-shadow: 0px 0px 3px black;">
+              <div style="position: relative">
+                <div style="position: absolute; left: -70px; top: -18px">Total</div>
+                <div style="position: absolute; left: -22px; top: -18px">${level}</div>
+              </div>
+            </div>
+          `;
+        ]]]
+grid_options:
+  columns: 9
+  rows: auto
 ```
