@@ -941,7 +941,7 @@ cards:
           `;
         ]]]
   - type: custom:button-card
-    entity: sensor.runelite_nor_pker_skill_total
+    entity: sensor.runelite_%username%_skill_total
     show_state: false
     show_name: false
     show_icon: false
