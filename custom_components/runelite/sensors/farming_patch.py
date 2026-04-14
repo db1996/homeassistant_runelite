@@ -16,8 +16,9 @@ class FarmingPatchTypeSensor(SensorEntity, RestoreEntity):
     ) -> None:
         self._username = username
         self._patch_type = patch_type
-        self._unique_id = sanitize(f"runelite_{username}_{patch_type}_patch")
-        self._name = f"Runelite {username} {patch_type} Patch"
+        self._attr_unique_id = sanitize(f"runelite_{username}_{patch_type}_patch")
+        self._attr_name = f"{patch_type.capitalize()} Patch"
+        self._attr_has_entity_name = True
         self._cycle_length_minutes = patch_data.get("cycle_length_minutes")
         self._global_cycles = patch_data.get("global_cycles")
         self._growth_ticks = patch_data.get("growth_ticks")
@@ -27,11 +28,11 @@ class FarmingPatchTypeSensor(SensorEntity, RestoreEntity):
 
     @property
     def name(self) -> str:
-        return self._name
+        return self._attr_name
 
     @property
     def unique_id(self) -> str:
-        return self._unique_id
+        return self._attr_unique_id
 
     @property
     def state(self):

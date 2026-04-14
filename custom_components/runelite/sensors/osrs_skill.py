@@ -19,9 +19,9 @@ class OsrsSkillSensor(SensorEntity, RestoreEntity):
         self._skill_virtual_level = skill_data.get('level', 1)
         self._skill_rank = skill_data.get('rank', 0)
         self._skill_name = skill_data.get('name', None)
-        self._unique_id = sanitize(f"runelite_{username}_skill_{skill_data['name']}")
-        self._attr_name = f"Runelite {username} Skill {skill_data['name'].capitalize()}"
-        self._attr_unique_id = self._unique_id
+        self._attr_unique_id = sanitize(f"runelite_{username}_skill_{skill_data['name']}")
+        self._attr_name = skill_data['name'].capitalize()
+        self._attr_has_entity_name = True
         self._attr_unit_of_measurement = "XP"
         self._attr_state_class = "total_increasing"
 

@@ -13,9 +13,9 @@ class PlayerPrayer(SensorEntity, RestoreEntity):
         self._username = username
         self._current_prayer = max_prayer
         self._max_prayer = max_prayer
-        self._unique_id = f"runelite_{sanitize(username)}_prayer"
-        self._attr_name = f"Runelite {username} Prayer"
-        self._attr_unique_id = self._unique_id
+        self._attr_unique_id = sanitize(f"runelite_{username}_prayer")
+        self._attr_name = "Prayer"
+        self._attr_has_entity_name = True
         self._attr_unit_of_measurement = "Pts"
         self._attr_state_class = "total"
 

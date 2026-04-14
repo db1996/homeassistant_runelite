@@ -14,6 +14,7 @@ from homeassistant.data_entry_flow import FlowResult
 from homeassistant.config_entries import ConfigEntry
 
 from .const import DOMAIN
+from .helpers import sanitize
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -38,7 +39,7 @@ class RuneliteConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             username = user_input["username"]
             farming_tick_offset = user_input.get("farming_tick_offset")
-            await self.async_set_unique_id(f"runelite_farming_{username}")
+            await self.async_set_unique_id(sanitize(f"runelite_farming_{username}"))
             self._abort_if_unique_id_configured()
             return self.async_create_entry(title=username, data={"username": username, "farming_tick_offset": farming_tick_offset})
 
@@ -53,7 +54,7 @@ class RuneliteConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         username = import_config.get("username")
         farming_tick_offset = import_config.get("farming_tick_offset")
         if username:
-            await self.async_set_unique_id(f"runelite_farming_{username}")
+            await self.async_set_unique_id(sanitize(f"runelite_farming_{username}"))
             self._abort_if_unique_id_configured()
             return self.async_create_entry(title=username, data={"username": username, "farming_tick_offset": farming_tick_offset})
         return self.async_abort(reason="invalid_import")
@@ -67,7 +68,7 @@ class RuneliteConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             username = user_input["username"]
             farming_tick_offset = user_input.get("farming_tick_offset")
-            await self.async_set_unique_id(f"runelite_farming_{username}")
+            await self.async_set_unique_id(sanitize(f"runelite_farming_{username}"))
             self._abort_if_unique_id_configured()
             return self.async_create_entry(title=username, data={"username": username, "farming_tick_offset": farming_tick_offset})
 

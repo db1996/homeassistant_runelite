@@ -14,9 +14,9 @@ class PlayerStatus(SensorEntity, RestoreEntity):
         self._is_online = False
         self._world = None
         self._last_ping_time = None
-        self._unique_id = f"runelite_{sanitize(username)}_player_status"
-        self._attr_name = f"Runelite {username} Player Status"
-        self._attr_unique_id = self._unique_id
+        self._attr_unique_id = sanitize(f"runelite_{username}_player_status")
+        self._attr_name = "Status"
+        self._attr_has_entity_name = True
 
     def _is_data_stale(self) -> bool:
         try:

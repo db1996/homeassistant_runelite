@@ -15,6 +15,7 @@ from .sensor import FarmingPatchTypeSensor, FarmingContractSensor, FarmingTickOf
 from datetime import datetime, timedelta, timezone
 from .const import DOMAIN, PATCH_TYPE_DATA, CROP_TYPE_DATA, DAILY_SENSORS  # Import constants
 from .patch_calculator import PatchCalculator  # Import your calculator function
+from .helpers import sanitize
 
 import voluptuous as vol
 
@@ -310,12 +311,35 @@ class RuneLiteFarmingServices:
     async def async_update_entity_data(self, entity_id: str, data: dict) -> None:
         """Set data for a specific entity."""
         integration_data = self.hass.data.get(DOMAIN, {})
+        # Try to resolve entity by unique_id first (object_id without domain),
+        # then by the provided entity_id. Also try a sanitized form of the id.
+        lookup_keys = []
+        if not entity_id:
+            _LOGGER.warning("No entity_id provided to update_entity_data")
+            return
+        # If an entity_id like 'sensor.xxx' is provided, prefer the object id (after the dot)
+        if "." in entity_id:
+            object_id = entity_id.split(".", 1)[1]
+            lookup_keys.append(object_id)
+        # Try the original entity_id as a fallback
+        lookup_keys.append(entity_id)
+        # Also try a sanitized version of the object id (in case of case/space differences)
+        try:
+            lookup_keys.append(sanitize(entity_id))
+        except Exception:
+            pass
+
         for entry_id, entry_data in integration_data.items():
-            sensor_entity = entry_data.get("entities", {}).get(entity_id)
+            entities_map = entry_data.get("entities", {})
+            sensor_entity = None
+            for key in lookup_keys:
+                sensor_entity = entities_map.get(key)
+                if sensor_entity is not None:
+                    break
             # get instance of the sensor entity
             if isinstance(sensor_entity, (FarmingPatchTypeSensor, FarmingContractSensor, FarmingTickOffsetSensor, BirdhousesSensor, DailySensor, OsrsActivitySensor, OsrsSkillSensor, CompostBinSensor,
                                           PlayerRunEnergy, PlayerHealth, PlayerPrayer, PlayerSpecialAttack, PlayerStatusEffects, PlayerStatus, OsrsSkillSensor, AgressionSensor)):
-                _LOGGER.debug(f"Updating entity '{entity_id}' with data: {data}")
+                _LOGGER.warning(f"Updating entity '{entity_id}' (lookup keys: {lookup_keys}) with data: {data}")
                 await sensor_entity.update_data(data)
                 return
         _LOGGER.warning(f"Entity '{entity_id}' not found in the integration data.")

@@ -12,9 +12,9 @@ class DailySensor(SensorEntity, RestoreEntity):
     def __init__(self, username: str, name: str):
         self._task_state = -1
         self._username = username
-        self._unique_id = sanitize(f"runelite_{username}_daily_{name}")
-        self._attr_name = f"Runelite {username} Daily {name.capitalize()}"
-        self._attr_unique_id = self._unique_id
+        self._attr_unique_id = sanitize(f"runelite_{username}_daily_{name}")
+        self._attr_name = name.capitalize()
+        self._attr_has_entity_name = True
         self._attr_unit_of_measurement = "Done"
 
     @property

@@ -10,17 +10,18 @@ class FarmingTickOffsetSensor(SensorEntity, RestoreEntity):
     def __init__(self, username: str, farming_tick: int = 0) -> None:
         super().__init__()
         self._username = username
-        self._unique_id = f"runelite_{sanitize(username)}_farming_tick_offset"
-        self._name = f"Runelite {username} Farming tick offset"
+        self._attr_unique_id = sanitize(f"runelite_{username}_farming_tick_offset")
+        self._attr_name = "Farming tick offset"
+        self._attr_has_entity_name = True
         self._farming_tick_offset = farming_tick
 
     @property
     def name(self) -> str:
-        return self._name
+        return self._attr_name
 
     @property
     def unique_id(self) -> str:
-        return self._unique_id
+        return self._attr_unique_id
 
     @property
     def state(self):

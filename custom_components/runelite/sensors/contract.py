@@ -11,8 +11,9 @@ class FarmingContractSensor(SensorEntity, RestoreEntity):
     def __init__(self, username: str) -> None:
         super().__init__()
         self._username = username
-        self._unique_id = f"runelite_{sanitize(username)}_farming_contract"
-        self._name = f"Runelite {username} Farming Contract"
+        self._attr_unique_id = sanitize(f"runelite_{username}_farming_contract")
+        self._attr_name = "Farming Contract"
+        self._attr_has_entity_name = True
         self._status = None
         self._completion_time = None
         self._patch_type = None
@@ -20,11 +21,11 @@ class FarmingContractSensor(SensorEntity, RestoreEntity):
 
     @property
     def name(self) -> str:
-        return self._name
+        return self._attr_name
 
     @property
     def unique_id(self) -> str:
-        return self._unique_id
+        return self._attr_unique_id
 
     @property
     def state(self):

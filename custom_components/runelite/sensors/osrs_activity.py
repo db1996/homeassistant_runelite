@@ -13,9 +13,9 @@ class OsrsActivitySensor(SensorEntity, RestoreEntity):
         self.coordinator = coordinator
         self._username = username
         self._activity_data = activity_data
-        self._unique_id = sanitize(f"runelite_{username}_activity_{activity_data['name']}")
-        self._attr_name = f"Runelite {username} Activity {activity_data['name'].capitalize()}"
-        self._attr_unique_id = self._unique_id
+        self._attr_unique_id = sanitize(f"runelite_{username}_activity_{activity_data['name']}")
+        self._attr_name = activity_data['name'].capitalize()
+        self._attr_has_entity_name = True
         self._attr_unit_of_measurement = "KC"
         self._attr_state_class = "total"
 

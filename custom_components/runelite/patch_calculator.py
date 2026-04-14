@@ -2,6 +2,7 @@ import logging
 from datetime import datetime, timedelta, timezone
 from .const import PATCH_TYPE_DATA, CROP_TYPE_DATA, DOMAIN
 from homeassistant.core import HomeAssistant
+from .helpers import sanitize
 _LOGGER = logging.getLogger(__name__)
 
 class PatchCalculator:
@@ -51,10 +52,34 @@ class PatchCalculator:
         offset_entity_id = f"sensor.runelite_{self.username}_farming_tick_offset"
         _LOGGER.info(f"Getting farming tick offset for entity: {offset_entity_id}")
         integration_data = self.hass.data.get(DOMAIN, {})
+
+        # Build lookup candidates: object_id (no domain), full entity_id, and sanitized forms
+        lookup_keys = []
+        if offset_entity_id and "." in offset_entity_id:
+            object_id = offset_entity_id.split('.', 1)[1]
+            lookup_keys.append(object_id)
+        lookup_keys.append(offset_entity_id)
+        try:
+            lookup_keys.append(sanitize(offset_entity_id))
+        except Exception:
+            # If sanitize fails for some reason, ignore
+            pass
+
         for entry_id, entry_data in integration_data.items():
-            sensor_entity = entry_data.get("entities", {}).get(offset_entity_id)
-            if(sensor_entity):
-                self.farming_tick_offset = sensor_entity._farming_tick_offset
+            entities_map = entry_data.get("entities", {})
+            sensor_entity = None
+            for key in lookup_keys:
+                sensor_entity = entities_map.get(key)
+                if sensor_entity is not None:
+                    break
+            if sensor_entity:
+                # sensor_entity should be an instance of the sensor class
+                # Try to read the farming tick attribute from the instance
+                try:
+                    self.farming_tick_offset = sensor_entity._farming_tick_offset
+                except Exception:
+                    # If attribute isn't present, try common alternate names
+                    self.farming_tick_offset = getattr(sensor_entity, "farming_tick_offset", self.farming_tick_offset)
                 _LOGGER.info(f"Farming tick offset: {self.farming_tick_offset}")
                 return
 

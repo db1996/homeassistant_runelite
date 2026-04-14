@@ -12,9 +12,9 @@ class PlayerSpecialAttack(SensorEntity, RestoreEntity):
     def __init__(self, username: str):
         self._username = username
         self._current_special_attack = 100
-        self._unique_id = f"runelite_{sanitize(username)}_special_attack"
-        self._attr_name = f"Runelite {username} Special Attack"
-        self._attr_unique_id = self._unique_id
+        self._attr_unique_id = sanitize(f"runelite_{username}_special_attack")
+        self._attr_name = "Special Attack"
+        self._attr_has_entity_name = True
         self._attr_unit_of_measurement = "%"
         self._attr_state_class = "total"
 

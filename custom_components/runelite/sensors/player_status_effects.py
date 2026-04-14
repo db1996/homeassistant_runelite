@@ -12,9 +12,9 @@ class PlayerStatusEffects(SensorEntity, RestoreEntity):
     def __init__(self, username: str):
         self._username = username
         self._current_status_effects = []
-        self._unique_id = f"runelite_{sanitize(username)}_status_effects"
-        self._attr_name = f"Runelite {username} Status Effects"
-        self._attr_unique_id = self._unique_id
+        self._attr_unique_id = sanitize(f"runelite_{username}_status_effects")
+        self._attr_name = "Status Effects"
+        self._attr_has_entity_name = True
         self._attr_unit_of_measurement = "%"
         self._attr_state_class = "total"
 

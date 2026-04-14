@@ -137,4 +137,10 @@ async def async_setup_entry(
     if "entities" not in hass.data[DOMAIN][config_entry.entry_id]:
         hass.data[DOMAIN][config_entry.entry_id]["entities"] = {}
     for entity in entities:
-        hass.data[DOMAIN][config_entry.entry_id]["entities"][entity.entity_id] = entity
+        hass.data[DOMAIN][config_entry.entry_id]["entities"][entity.unique_id] = entity
+        # Also store by entity_id to support service calls that pass the entity_id
+        try:
+            hass.data[DOMAIN][config_entry.entry_id]["entities"][entity.unique_id] = entity
+        except Exception:
+            # entity.entity_id may sometimes be None or not set; ignore if unavailable
+            pass

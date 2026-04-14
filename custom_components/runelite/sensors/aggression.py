@@ -10,19 +10,20 @@ class AgressionSensor(SensorEntity, RestoreEntity):
     def __init__(self, username: str) -> None:
         super().__init__()
         self._username = username
-        self._unique_id = f"runelite_{sanitize(username)}_aggression"
-        self._name = f"Runelite {username} Aggression"
+        self._attr_unique_id = sanitize(f"runelite_{username}_aggression")
+        self._attr_name = "Aggression"
+        self._attr_has_entity_name = True
         self._status = None
         self._seconds = 0
         self._ticks = 0
 
     @property
     def name(self) -> str:
-        return self._name
+        return self._attr_name
 
     @property
     def unique_id(self) -> str:
-        return self._unique_id
+        return self._attr_unique_id
 
     @property
     def state(self):
