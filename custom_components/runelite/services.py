@@ -339,7 +339,7 @@ class RuneLiteFarmingServices:
             # get instance of the sensor entity
             if isinstance(sensor_entity, (FarmingPatchTypeSensor, FarmingContractSensor, FarmingTickOffsetSensor, BirdhousesSensor, DailySensor, OsrsActivitySensor, OsrsSkillSensor, CompostBinSensor,
                                           PlayerRunEnergy, PlayerHealth, PlayerPrayer, PlayerSpecialAttack, PlayerStatusEffects, PlayerStatus, OsrsSkillSensor, AgressionSensor)):
-                _LOGGER.warning(f"Updating entity '{entity_id}' (lookup keys: {lookup_keys}) with data: {data}")
+                _LOGGER.debug(f"Updating entity '{entity_id}' (lookup keys: {lookup_keys}) with data: {data}")
                 await sensor_entity.update_data(data)
                 return
         _LOGGER.warning(f"Entity '{entity_id}' not found in the integration data.")
