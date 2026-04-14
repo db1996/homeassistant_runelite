@@ -108,7 +108,7 @@ async def async_setup_entry(
 
         entity = DailySensor(username, sensor_name)
         entities.append(entity)
-    _LOGGER.warning("Creating player stats", max_health, max_prayer)
+    _LOGGER.warning("Creating player stats")
     health_entity = PlayerHealth(username, max_health)
     entities.append(health_entity)
 
