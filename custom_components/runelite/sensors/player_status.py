@@ -21,10 +21,10 @@ class PlayerStatus(SensorEntity, RestoreEntity):
     def _is_data_stale(self) -> bool:
         try:
             world = int(self._world)
-        except ValueError:
+        except (ValueError, TypeError):
             return True
 
-        if not self._last_ping_time or self._world < 0:
+        if not self._last_ping_time or world < 0:
             return True
 
         return (datetime.now(timezone.utc) - self._last_ping_time) > timedelta(seconds=PLAYER_LOGOUT_TIME)
@@ -72,7 +72,7 @@ class PlayerStatus(SensorEntity, RestoreEntity):
         # try to convert world to an integer, if it fails or is invalid, set to None
         try:
             world = int(world)
-        except ValueError:
+        except (ValueError, TypeError):
             world = None
 
         self._world = world
