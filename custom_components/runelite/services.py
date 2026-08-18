@@ -52,6 +52,8 @@ SET_ENTITY_DATA_SCHEMA = vol.Schema(
         vol.Optional("is_online"): cv.boolean,
         vol.Optional("world"): cv.string,
         vol.Optional("virtual_level"): vol.All(int, vol.Range(min=-100, max=200)),
+        vol.Optional("xp"): vol.All(int, vol.Range(min=0, max=5000000000)),
+        vol.Optional("level"): vol.All(int, vol.Range(min=1, max=200)),
     }
 )
 

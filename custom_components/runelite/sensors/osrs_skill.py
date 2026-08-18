@@ -27,7 +27,7 @@ class OsrsSkillSensor(SensorEntity, RestoreEntity):
 
     @property
     def state(self):
-        return self._skill_data['xp']
+        return self._skill_xp
     
     @property
     def device_info(self) -> DeviceInfo:
@@ -67,4 +67,6 @@ class OsrsSkillSensor(SensorEntity, RestoreEntity):
     
     async def update_data(self, data: dict) -> None:
         self._skill_virtual_level = data.get("virtual_level", self._skill_virtual_level)
+        self._skill_xp = data.get("xp", self._skill_xp)
+        self._skill_level = data.get("level", self._skill_level)
         self.async_schedule_update_ha_state()
