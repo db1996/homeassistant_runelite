@@ -55,7 +55,7 @@ class OsrsSkillSensor(SensorEntity, RestoreEntity):
         skills = self.coordinator.data.get("skills", [])
         for skill in skills:
             if skill.get("id") == self._skill_id:
-                self._skill_xp = skill.get("xp", self._skill_xp)
+                self._skill_xp = max(skill.get("xp", self._skill_xp), self._skill_xp)
                 self._skill_level = skill.get("level", self._skill_level)
                 self._skill_rank = skill.get("rank", self._skill_rank)
                 self._skill_name = skill.get("name", self._skill_name)
