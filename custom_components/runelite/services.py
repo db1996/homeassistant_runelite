@@ -61,6 +61,11 @@ COLLECTION_LOG_NOTIFY_SCHEMA = vol.Schema({
     vol.Required("item_name"): cv.string,
 })
 
+# Optional so an older plugin build, which sends no data at all, keeps working.
+IDLE_NOTIFY_SCHEMA = vol.Schema({
+    vol.Optional("idle_ticks"): vol.All(int, vol.Range(min=0)),
+})
+
 SET_MULTI_ENTITY_DATA_SCHEMA = vol.Schema(
     {
         vol.Required("entities"): vol.All(
@@ -269,6 +274,14 @@ class RuneLiteFarmingServices:
             DOMAIN,
             "trigger_idle_notify",
             self.async_idle_notify_service,
+            schema=IDLE_NOTIFY_SCHEMA,
+        )
+
+        self.hass.services.async_register(
+            DOMAIN,
+            "trigger_active_notify",
+            self.async_active_notify_service,
+            schema=IDLE_NOTIFY_SCHEMA,
         )
 
     def get_default_username(self) -> str:
@@ -542,10 +555,25 @@ class RuneLiteFarmingServices:
         )
 
     async def async_idle_notify_service(self, service: ServiceCall) -> None:
-        _LOGGER.info("Firing player idle notify event")
+        idle_ticks = service.data.get("idle_ticks")
+        _LOGGER.info("Firing player idle notify event (idle_ticks=%s)", idle_ticks)
 
         self.hass.bus.async_fire(
-            f"{DOMAIN}_idle_notify"
+            f"{DOMAIN}_idle_notify",
+            {
+                "idle_ticks": idle_ticks,
+            }
+        )
+
+    async def async_active_notify_service(self, service: ServiceCall) -> None:
+        idle_ticks = service.data.get("idle_ticks")
+        _LOGGER.info("Firing player active notify event (idle_ticks=%s)", idle_ticks)
+
+        self.hass.bus.async_fire(
+            f"{DOMAIN}_active_notify",
+            {
+                "idle_ticks": idle_ticks,
+            }
         )
 
     async def async_refetch_osrs_highscores(self, service: ServiceCall) -> None:

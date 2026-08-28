@@ -836,3 +836,21 @@ trigger_varbit_change_notify:
 trigger_idle_notify:
   name: Idle Notify
   description: Notifies player as idle.
+  fields:
+    idle_ticks:
+      required: false
+      name: Idle ticks
+      description: How many game ticks the player has been idle.
+      selector:
+        number:
+
+trigger_active_notify:
+  name: Active Notify
+  description: Notifies that the player is active again after being idle.
+  fields:
+    idle_ticks:
+      required: false
+      name: Idle ticks
+      description: How many game ticks the player was idle before becoming active.
+      selector:
+        number:
