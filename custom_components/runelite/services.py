@@ -8,6 +8,7 @@ from custom_components.runelite.sensors.player_run_energy import PlayerRunEnergy
 from custom_components.runelite.sensors.player_special_attack import PlayerSpecialAttack
 from custom_components.runelite.sensors.player_status import PlayerStatus
 from custom_components.runelite.sensors.player_status_effects import PlayerStatusEffects
+from custom_components.runelite.sensors.slayer_task import SlayerTaskSensor
 from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers import config_validation as cv
@@ -54,6 +55,12 @@ SET_ENTITY_DATA_SCHEMA = vol.Schema(
         vol.Optional("virtual_level"): vol.All(int, vol.Range(min=-100, max=200)),
         vol.Optional("xp"): vol.All(int, vol.Range(min=0, max=5000000000)),
         vol.Optional("level"): vol.All(int, vol.Range(min=1, max=200)),
+        vol.Optional("task"): cv.string,
+        vol.Optional("remaining_amount"): vol.All(int, vol.Range(min=0)),
+        vol.Optional("initial_amount"): vol.All(int, vol.Range(min=0)),
+        vol.Optional("task_location"): cv.string,
+        vol.Optional("streak"): vol.All(int, vol.Range(min=0)),
+        vol.Optional("points"): vol.All(int, vol.Range(min=0)),
     }
 )
 
@@ -353,7 +360,8 @@ class RuneLiteFarmingServices:
                     break
             # get instance of the sensor entity
             if isinstance(sensor_entity, (FarmingPatchTypeSensor, FarmingContractSensor, FarmingTickOffsetSensor, BirdhousesSensor, DailySensor, OsrsActivitySensor, OsrsSkillSensor, CompostBinSensor,
-                                          PlayerRunEnergy, PlayerHealth, PlayerPrayer, PlayerSpecialAttack, PlayerStatusEffects, PlayerStatus, OsrsSkillSensor, AgressionSensor)):
+                                          PlayerRunEnergy, PlayerHealth, PlayerPrayer, PlayerSpecialAttack, PlayerStatusEffects, PlayerStatus, OsrsSkillSensor, AgressionSensor,
+                                          SlayerTaskSensor)):
                 _LOGGER.debug(f"Updating entity '{entity_id}' (lookup keys: {lookup_keys}) with data: {data}")
                 await sensor_entity.update_data(data)
                 return
