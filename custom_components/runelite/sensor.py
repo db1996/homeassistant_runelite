@@ -25,6 +25,7 @@ from .sensors.farming_tick import FarmingTickOffsetSensor
 from .sensors.compost_bin import CompostBinSensor
 from .sensors.aggression import AgressionSensor
 from .sensors.slayer_task import SlayerTaskSensor
+from .sensors.last_quest import LastQuestSensor
 from .helpers import sanitize
 
 DOMAIN = "runelite"
@@ -133,6 +134,9 @@ async def async_setup_entry(
 
     slayer_task_entity = SlayerTaskSensor(username)
     entities.append(slayer_task_entity)
+
+    last_quest_entity = LastQuestSensor(username)
+    entities.append(last_quest_entity)
 
     async_add_entities(entities)
 
