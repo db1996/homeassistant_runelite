@@ -9,6 +9,7 @@ from custom_components.runelite.sensors.player_special_attack import PlayerSpeci
 from custom_components.runelite.sensors.player_status import PlayerStatus
 from custom_components.runelite.sensors.player_status_effects import PlayerStatusEffects
 from custom_components.runelite.sensors.slayer_task import SlayerTaskSensor
+from custom_components.runelite.sensors.last_quest import LastQuestSensor
 from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers import config_validation as cv
@@ -268,6 +269,16 @@ class RuneLiteFarmingServices:
 
         self.hass.services.async_register(
             DOMAIN,
+            "trigger_quest_complete_notify",
+            self.async_quest_complete_notify_service,
+            schema=vol.Schema({
+                vol.Required("quest"): cv.string,
+                vol.Optional("quest_points"): int,
+            }),
+        )
+
+        self.hass.services.async_register(
+            DOMAIN,
             "trigger_varbit_change_notify",
             self.async_varbit_change_service,
             schema=vol.Schema({
@@ -361,7 +372,7 @@ class RuneLiteFarmingServices:
             # get instance of the sensor entity
             if isinstance(sensor_entity, (FarmingPatchTypeSensor, FarmingContractSensor, FarmingTickOffsetSensor, BirdhousesSensor, DailySensor, OsrsActivitySensor, OsrsSkillSensor, CompostBinSensor,
                                           PlayerRunEnergy, PlayerHealth, PlayerPrayer, PlayerSpecialAttack, PlayerStatusEffects, PlayerStatus, OsrsSkillSensor, AgressionSensor,
-                                          SlayerTaskSensor)):
+                                          SlayerTaskSensor, LastQuestSensor)):
                 _LOGGER.debug(f"Updating entity '{entity_id}' (lookup keys: {lookup_keys}) with data: {data}")
                 await sensor_entity.update_data(data)
                 return
@@ -534,6 +545,19 @@ class RuneLiteFarmingServices:
         )
 
         
+    async def async_quest_complete_notify_service(self, service: ServiceCall) -> None:
+        quest = service.data["quest"]
+        quest_points = service.data.get("quest_points")
+        _LOGGER.info(f"Firing quest_complete_notify event for quest: {quest}")
+
+        self.hass.bus.async_fire(
+            f"{DOMAIN}_quest_complete_notify",
+            {
+                "quest": quest,
+                "quest_points": quest_points,
+            }
+        )
+
     async def async_achievement_diary_notify_service(self, service: ServiceCall) -> None:
         task_name = service.data["task_name"]
         tier = service.data.get("tier")
