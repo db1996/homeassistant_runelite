@@ -36,7 +36,11 @@ SET_ENTITY_DATA_SCHEMA = vol.Schema(
         vol.Optional("status"): cv.string,
         vol.Optional("crop_type"): cv.string,
         vol.Optional("patch_type"): cv.string,
-        vol.Optional("state"): vol.All(int, vol.Range(min=-1, max=1)),
+        # Farming sends -1..1; the last quest sensor sends a state name.
+        vol.Optional("state"): vol.Any(
+            vol.All(int, vol.Range(min=-1, max=1)),
+            vol.In(["NOT_STARTED", "IN_PROGRESS", "FINISHED", "UNKNOWN", "NONE"]),
+        ),
         vol.Optional("farming_tick_offset"): vol.All(
             int, vol.Range(min=-30, max=30)
         ),
@@ -62,6 +66,12 @@ SET_ENTITY_DATA_SCHEMA = vol.Schema(
         vol.Optional("task_location"): cv.string,
         vol.Optional("streak"): vol.All(int, vol.Range(min=0)),
         vol.Optional("points"): vol.All(int, vol.Range(min=0)),
+        # Last quest sensor.
+        vol.Optional("quest"): cv.string,
+        vol.Optional("stage"): vol.All(int, vol.Range(min=0)),
+        vol.Optional("quest_points"): vol.All(int, vol.Range(min=0)),
+        vol.Optional("completed"): vol.All(int, vol.Range(min=0)),
+        vol.Optional("total"): vol.All(int, vol.Range(min=0)),
     }
 )
 
