@@ -10,6 +10,7 @@ from custom_components.runelite.sensors.player_status import PlayerStatus
 from custom_components.runelite.sensors.player_status_effects import PlayerStatusEffects
 from custom_components.runelite.sensors.slayer_task import SlayerTaskSensor
 from custom_components.runelite.sensors.last_quest import LastQuestSensor
+from custom_components.runelite.sensors.inventory import InventorySensor, EquipmentSensor
 from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers import config_validation as cv
@@ -72,6 +73,13 @@ SET_ENTITY_DATA_SCHEMA = vol.Schema(
         vol.Optional("quest_points"): vol.All(int, vol.Range(min=0)),
         vol.Optional("completed"): vol.All(int, vol.Range(min=0)),
         vol.Optional("total"): vol.All(int, vol.Range(min=0)),
+        # Inventory and equipment. Loosely typed on purpose: the plugin
+        # decides what an item row carries, and a stricter schema here would
+        # reject the whole batch the moment it learns something new.
+        vol.Optional("items"): vol.All([dict]),
+        vol.Optional("used_slots"): vol.All(int, vol.Range(min=0, max=28)),
+        vol.Optional("free_slots"): vol.All(int, vol.Range(min=0, max=28)),
+        vol.Optional("worn"): dict,
     }
 )
 
@@ -382,7 +390,7 @@ class RuneLiteFarmingServices:
             # get instance of the sensor entity
             if isinstance(sensor_entity, (FarmingPatchTypeSensor, FarmingContractSensor, FarmingTickOffsetSensor, BirdhousesSensor, DailySensor, OsrsActivitySensor, OsrsSkillSensor, CompostBinSensor,
                                           PlayerRunEnergy, PlayerHealth, PlayerPrayer, PlayerSpecialAttack, PlayerStatusEffects, PlayerStatus, OsrsSkillSensor, AgressionSensor,
-                                          SlayerTaskSensor, LastQuestSensor)):
+                                          SlayerTaskSensor, LastQuestSensor, InventorySensor, EquipmentSensor)):
                 _LOGGER.debug(f"Updating entity '{entity_id}' (lookup keys: {lookup_keys}) with data: {data}")
                 await sensor_entity.update_data(data)
                 return
