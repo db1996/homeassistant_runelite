@@ -8,13 +8,6 @@ INVENTORY_SLOTS = 28
 
 
 class InventorySensor(SensorEntity, RestoreEntity):
-    """What the player is carrying, as reported by the RuneLite plugin.
-
-    The state is the number of used slots, so "inventory full" is simply
-    state == 28 -- or the `full` attribute, for automations that would rather
-    not know the number.
-    """
-
     def __init__(self, username: str) -> None:
         super().__init__()
         self._username = username
@@ -71,18 +64,11 @@ class InventorySensor(SensorEntity, RestoreEntity):
     async def update_data(self, data: dict) -> None:
         if "items" in data:
             self._items = data["items"]
-            # used_slots travels with the list, but the list is the truth.
             self._used_slots = data.get("used_slots", len(self._items))
         self.async_schedule_update_ha_state()
 
 
 class EquipmentSensor(SensorEntity, RestoreEntity):
-    """What the player is wearing, per equipment slot.
-
-    The state is the weapon's name, which is the slot most worth glancing at;
-    everything else is in the `worn` attribute, keyed by slot.
-    """
-
     def __init__(self, username: str) -> None:
         super().__init__()
         self._username = username

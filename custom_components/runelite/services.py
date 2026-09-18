@@ -73,9 +73,6 @@ SET_ENTITY_DATA_SCHEMA = vol.Schema(
         vol.Optional("quest_points"): vol.All(int, vol.Range(min=0)),
         vol.Optional("completed"): vol.All(int, vol.Range(min=0)),
         vol.Optional("total"): vol.All(int, vol.Range(min=0)),
-        # Inventory and equipment. Loosely typed on purpose: the plugin
-        # decides what an item row carries, and a stricter schema here would
-        # reject the whole batch the moment it learns something new.
         vol.Optional("items"): vol.All([dict]),
         vol.Optional("used_slots"): vol.All(int, vol.Range(min=0, max=28)),
         vol.Optional("free_slots"): vol.All(int, vol.Range(min=0, max=28)),
