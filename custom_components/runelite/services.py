@@ -11,6 +11,7 @@ from custom_components.runelite.sensors.player_status_effects import PlayerStatu
 from custom_components.runelite.sensors.slayer_task import SlayerTaskSensor
 from custom_components.runelite.sensors.last_quest import LastQuestSensor
 from custom_components.runelite.sensors.inventory import InventorySensor, EquipmentSensor
+from custom_components.runelite.sensors.current_activity import CurrentActivitySensor
 from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers import config_validation as cv
@@ -77,6 +78,7 @@ SET_ENTITY_DATA_SCHEMA = vol.Schema(
         vol.Optional("used_slots"): vol.All(int, vol.Range(min=0, max=28)),
         vol.Optional("free_slots"): vol.All(int, vol.Range(min=0, max=28)),
         vol.Optional("worn"): dict,
+        vol.Optional("activity"): cv.string,
     }
 )
 
@@ -387,7 +389,7 @@ class RuneLiteFarmingServices:
             # get instance of the sensor entity
             if isinstance(sensor_entity, (FarmingPatchTypeSensor, FarmingContractSensor, FarmingTickOffsetSensor, BirdhousesSensor, DailySensor, OsrsActivitySensor, OsrsSkillSensor, CompostBinSensor,
                                           PlayerRunEnergy, PlayerHealth, PlayerPrayer, PlayerSpecialAttack, PlayerStatusEffects, PlayerStatus, OsrsSkillSensor, AgressionSensor,
-                                          SlayerTaskSensor, LastQuestSensor, InventorySensor, EquipmentSensor)):
+                                          SlayerTaskSensor, LastQuestSensor, InventorySensor, EquipmentSensor, CurrentActivitySensor)):
                 _LOGGER.debug(f"Updating entity '{entity_id}' (lookup keys: {lookup_keys}) with data: {data}")
                 await sensor_entity.update_data(data)
                 return

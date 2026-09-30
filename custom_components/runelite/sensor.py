@@ -27,6 +27,7 @@ from .sensors.aggression import AgressionSensor
 from .sensors.slayer_task import SlayerTaskSensor
 from .sensors.last_quest import LastQuestSensor
 from .sensors.inventory import InventorySensor, EquipmentSensor
+from .sensors.current_activity import CurrentActivitySensor
 from .helpers import sanitize
 
 DOMAIN = "runelite"
@@ -141,6 +142,7 @@ async def async_setup_entry(
 
     entities.append(InventorySensor(username))
     entities.append(EquipmentSensor(username))
+    entities.append(CurrentActivitySensor(username))
 
     async_add_entities(entities)
 
