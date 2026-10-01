@@ -5,13 +5,6 @@ from homeassistant.helpers.entity import DeviceInfo
 
 
 class CurrentActivitySensor(SensorEntity):
-    """The skill the player is working on right now, read from their animation.
-
-    State is the skill's name in lowercase ("mining", "fishing", ...) or "none".
-    Not restored across a restart on purpose: an activity from before the
-    restart is almost certainly over, and the plugin sends the current one
-    again as soon as it changes or the player logs in.
-    """
 
     def __init__(self, username: str) -> None:
         super().__init__()
