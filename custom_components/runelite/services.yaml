@@ -850,6 +850,40 @@ trigger_varbit_change_notify:
       selector:
         number:
 
+trigger_gem_crab_hp_notify:
+  name: Gem Crab HP Notify
+  description: Notifies that the gem crab's HP dropped below the threshold and it is about to burrow.
+  fields:
+    hp_percent:
+      required: false
+      name: HP percent
+      description: The gem crab's HP percentage when the event fired.
+      selector:
+        number:
+    threshold:
+      required: false
+      name: Threshold
+      description: The configured HP threshold percentage.
+      selector:
+        number:
+    world:
+      required: false
+      name: World
+      description: The world the gem crab is on.
+      selector:
+        number:
+
+trigger_gem_crab_can_mine_notify:
+  name: Gem Crab Can Mine Notify
+  description: Notifies that you did enough damage to mine the gem crab's shell.
+  fields:
+    world:
+      required: false
+      name: World
+      description: The world the gem crab is on.
+      selector:
+        number:
+
 trigger_idle_notify:
   name: Idle Notify
   description: Notifies player as idle.

@@ -307,6 +307,26 @@ class RuneLiteFarmingServices:
 
         self.hass.services.async_register(
             DOMAIN,
+            "trigger_gem_crab_hp_notify",
+            self.async_gem_crab_hp_notify_service,
+            schema=vol.Schema({
+                vol.Optional("hp_percent"): int,
+                vol.Optional("threshold"): int,
+                vol.Optional("world"): int,
+            }),
+        )
+
+        self.hass.services.async_register(
+            DOMAIN,
+            "trigger_gem_crab_can_mine_notify",
+            self.async_gem_crab_can_mine_notify_service,
+            schema=vol.Schema({
+                vol.Optional("world"): int,
+            }),
+        )
+
+        self.hass.services.async_register(
+            DOMAIN,
             "trigger_idle_notify",
             self.async_idle_notify_service,
             schema=IDLE_NOTIFY_SCHEMA,
@@ -600,6 +620,30 @@ class RuneLiteFarmingServices:
                 "varbit_id": varbit_id,
                 "old_value": old_value,
                 "new_value": new_value,
+            }
+        )
+
+    async def async_gem_crab_hp_notify_service(self, service: ServiceCall) -> None:
+        hp_percent = service.data.get("hp_percent")
+        _LOGGER.info("Firing gem crab hp notify event (hp_percent=%s)", hp_percent)
+
+        self.hass.bus.async_fire(
+            f"{DOMAIN}_gem_crab_hp_notify",
+            {
+                "hp_percent": hp_percent,
+                "threshold": service.data.get("threshold"),
+                "world": service.data.get("world"),
+            }
+        )
+
+    async def async_gem_crab_can_mine_notify_service(self, service: ServiceCall) -> None:
+        world = service.data.get("world")
+        _LOGGER.info("Firing gem crab can mine notify event (world=%s)", world)
+
+        self.hass.bus.async_fire(
+            f"{DOMAIN}_gem_crab_can_mine_notify",
+            {
+                "world": world,
             }
         )
 
