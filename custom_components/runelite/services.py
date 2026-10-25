@@ -20,6 +20,7 @@ from datetime import datetime, timedelta, timezone
 from .const import DOMAIN, PATCH_TYPE_DATA, CROP_TYPE_DATA, DAILY_SENSORS  # Import constants
 from .patch_calculator import PatchCalculator  # Import your calculator function
 from .helpers import sanitize
+from .event import RuneliteEventEntity, event_unique_id
 
 import voluptuous as vol
 
@@ -557,56 +558,55 @@ class RuneLiteFarmingServices:
                 else:
                     _LOGGER.warning(f"Daily sensor '{entity_id}' not found for {username}.")
 
+    def _fire_event(self, name: str, entity_key: str, event_type: str, data: dict) -> None:
+        """Fire the event on the bus and on the matching event entity."""
+        self.hass.bus.async_fire(f"{DOMAIN}_{name}", data)
+
+        unique_id = event_unique_id(self.get_default_username(), entity_key)
+        for entry_data in self.hass.data.get(DOMAIN, {}).values():
+            entity = entry_data.get("entities", {}).get(unique_id)
+            if isinstance(entity, RuneliteEventEntity):
+                entity.fire(event_type, data)
+                return
+        _LOGGER.warning(f"Event entity '{unique_id}' not found in the integration data.")
+
     async def async_collection_log_notify_service(self, service: ServiceCall) -> None:
         item_name = service.data["item_name"]
         _LOGGER.info(f"Firing collection_log_notify event for item: {item_name}")
-        
-        self.hass.bus.async_fire(
-            f"{DOMAIN}_collection_log_notify",  # results in event like "runelite_collection_log_notify"
-            {
-                "item_name": item_name,
-            }
-        )
+
+        self._fire_event("collection_log_notify", "collection_log", "new_item", {
+            "item_name": item_name,
+        })
 
     async def async_combat_task_notify_service(self, service: ServiceCall) -> None:
         task_name = service.data["task_name"]
         tier = service.data.get("tier", "unknown")
         _LOGGER.info(f"Firing combat_task_notify event for task: {task_name}")
 
-        self.hass.bus.async_fire(
-            f"{DOMAIN}_combat_task_notify",  # results in event like "runelite_combat_task_notify"
-            {
-                "task_name": task_name,
-                "tier": tier,
-            }
-        )
+        self._fire_event("combat_task_notify", "combat_task", "completed", {
+            "task_name": task_name,
+            "tier": tier,
+        })
 
-        
     async def async_quest_complete_notify_service(self, service: ServiceCall) -> None:
         quest = service.data["quest"]
         quest_points = service.data.get("quest_points")
         _LOGGER.info(f"Firing quest_complete_notify event for quest: {quest}")
 
-        self.hass.bus.async_fire(
-            f"{DOMAIN}_quest_complete_notify",
-            {
-                "quest": quest,
-                "quest_points": quest_points,
-            }
-        )
+        self._fire_event("quest_complete_notify", "quest", "completed", {
+            "quest": quest,
+            "quest_points": quest_points,
+        })
 
     async def async_achievement_diary_notify_service(self, service: ServiceCall) -> None:
         task_name = service.data["task_name"]
         tier = service.data.get("tier")
         _LOGGER.info(f"Firing achievement_diary_notify event for task: {task_name}")
 
-        self.hass.bus.async_fire(
-            f"{DOMAIN}_achievement_diary_notify",  # results in event like "runelite_achievement_diary_notify"
-            {
-                "task_name": task_name,
-                "tier": tier, 
-            }
-        )
+        self._fire_event("achievement_diary_notify", "achievement_diary", "completed", {
+            "task_name": task_name,
+            "tier": tier,
+        })
 
     async def async_varbit_change_service(self, service: ServiceCall) -> None:
         varbit_id = service.data["varbit_id"]
@@ -614,60 +614,45 @@ class RuneLiteFarmingServices:
         new_value = service.data.get("new_value")
         _LOGGER.info(f"Firing varbit_change_notify event for varbit: {varbit_id}")
 
-        self.hass.bus.async_fire(
-            f"{DOMAIN}_varbit_change_notify",  # results in event like "runelite_varbit_change"
-            {
-                "varbit_id": varbit_id,
-                "old_value": old_value,
-                "new_value": new_value,
-            }
-        )
+        self._fire_event("varbit_change_notify", "varbit", "changed", {
+            "varbit_id": varbit_id,
+            "old_value": old_value,
+            "new_value": new_value,
+        })
 
     async def async_gem_crab_hp_notify_service(self, service: ServiceCall) -> None:
         hp_percent = service.data.get("hp_percent")
         _LOGGER.info("Firing gem crab hp notify event (hp_percent=%s)", hp_percent)
 
-        self.hass.bus.async_fire(
-            f"{DOMAIN}_gem_crab_hp_notify",
-            {
-                "hp_percent": hp_percent,
-                "threshold": service.data.get("threshold"),
-                "world": service.data.get("world"),
-            }
-        )
+        self._fire_event("gem_crab_hp_notify", "gem_crab", "hp_threshold", {
+            "hp_percent": hp_percent,
+            "threshold": service.data.get("threshold"),
+            "world": service.data.get("world"),
+        })
 
     async def async_gem_crab_can_mine_notify_service(self, service: ServiceCall) -> None:
         world = service.data.get("world")
         _LOGGER.info("Firing gem crab can mine notify event (world=%s)", world)
 
-        self.hass.bus.async_fire(
-            f"{DOMAIN}_gem_crab_can_mine_notify",
-            {
-                "world": world,
-            }
-        )
+        self._fire_event("gem_crab_can_mine_notify", "gem_crab", "can_mine", {
+            "world": world,
+        })
 
     async def async_idle_notify_service(self, service: ServiceCall) -> None:
         idle_ticks = service.data.get("idle_ticks")
         _LOGGER.info("Firing player idle notify event (idle_ticks=%s)", idle_ticks)
 
-        self.hass.bus.async_fire(
-            f"{DOMAIN}_idle_notify",
-            {
-                "idle_ticks": idle_ticks,
-            }
-        )
+        self._fire_event("idle_notify", "idle", "idle", {
+            "idle_ticks": idle_ticks,
+        })
 
     async def async_active_notify_service(self, service: ServiceCall) -> None:
         idle_ticks = service.data.get("idle_ticks")
         _LOGGER.info("Firing player active notify event (idle_ticks=%s)", idle_ticks)
 
-        self.hass.bus.async_fire(
-            f"{DOMAIN}_active_notify",
-            {
-                "idle_ticks": idle_ticks,
-            }
-        )
+        self._fire_event("active_notify", "idle", "active", {
+            "idle_ticks": idle_ticks,
+        })
 
     async def async_refetch_osrs_highscores(self, service: ServiceCall) -> None:
         """Reset the birdhouses."""

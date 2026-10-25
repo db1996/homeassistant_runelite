@@ -245,6 +245,17 @@ CROP_TYPE_DATA = {
     "poison_ivy": {"patch_type": "bush", "cycles": 8},
 }
 
+# Event entities: key -> (name, icon, event types)
+EVENT_ENTITIES = {
+    "collection_log": ("Collection log", "mdi:book-open-variant", ["new_item"]),
+    "combat_task": ("Combat task", "mdi:sword-cross", ["completed"]),
+    "achievement_diary": ("Achievement diary", "mdi:notebook-check", ["completed"]),
+    "quest": ("Quest", "mdi:script-text", ["completed"]),
+    "varbit": ("Varbit", "mdi:variable", ["changed"]),
+    "idle": ("Idle", "mdi:sleep", ["idle", "active"]),
+    "gem_crab": ("Gem crab", "mdi:diamond-stone", ["hp_threshold", "can_mine"]),
+}
+
 DAILY_SENSORS = [
     "herb_boxes",
     "staves",

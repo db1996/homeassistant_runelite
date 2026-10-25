@@ -12,7 +12,7 @@ from .coordinator import OsrsHighscoresCoordinator
 from .const import DOMAIN
 
 DOMAIN = "runelite"
-PLATFORMS = [Platform.SENSOR]
+PLATFORMS = [Platform.SENSOR, Platform.EVENT]
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
