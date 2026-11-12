@@ -213,6 +213,17 @@ PATCH_TYPE_DATA = {
             "4": ["02:40", "13:20"],
         },
     },
+    "anima": {
+        "has_farming_contract": False,
+        "cycle_length_minutes": 640,
+        "global_cycles": 8,
+        "growth_ticks_days": {
+            "1": ["00:00", "10:40", "21:20"],
+            "2": ["08:00", "18:40"],
+            "3": ["05:20", "16:00"],
+            "4": ["02:40", "13:20"],
+        },
+    },
     "seaweed": {
         "has_farming_contract": False,
         "global_cycles": 4,

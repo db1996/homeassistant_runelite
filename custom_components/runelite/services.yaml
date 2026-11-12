@@ -37,12 +37,13 @@ set_entity_data:
     patch_type:
       required: false
       name: Patch Type
-      description: The type of farming patch. Herb, Hespori, Fruit tree, Flower, Mushroom, Cactus and Potato cactus do not have crop types. They all have the same amount of growth ticks for each patch
+      description: The type of farming patch. Herb, Hespori, Anima, Fruit tree, Flower, Mushroom, Cactus and Potato cactus do not have crop types. They all have the same amount of growth ticks for each patch
       selector:
         select:
           options:
             - herb
             - hespori
+            - anima
             - tree
             - fruit_tree
             - cactus
@@ -181,12 +182,13 @@ calculate_patch_or_crop:
     patch_type:
       required: false
       name: Patch Type
-      description: The type of farming patch. Herb, Hespori, Fruit tree, Flower, Mushroom, Cactus and Potato cactus do not have crop types. They all have the same amount of growth ticks for each patch
+      description: The type of farming patch. Herb, Hespori, Anima, Fruit tree, Flower, Mushroom, Cactus and Potato cactus do not have crop types. They all have the same amount of growth ticks for each patch
       selector:
         select:
           options:
             - herb
             - hespori
+            - anima
             - tree
             - fruit_tree
             - cactus
@@ -237,12 +239,13 @@ calculate_farming_contract:
     patch_type:
       required: false
       name: Patch Type
-      description: The type of farming patch. Herb, Hespori, Fruit tree, Flower, Mushroom, Cactus and Potato cactus do not have crop types. They all have the same amount of growth ticks for each patch
+      description: The type of farming patch. Herb, Hespori, Anima, Fruit tree, Flower, Mushroom, Cactus and Potato cactus do not have crop types. They all have the same amount of growth ticks for each patch
       selector:
         select:
           options:
             - herb
             - hespori
+            - anima
             - tree
             - fruit_tree
             - cactus
@@ -386,6 +389,15 @@ bush_patch:
 hespori_patch:
   name: Calculate Hespori Patch
   description: The hespori patch completion time is calculated
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+anima_patch:
+  name: Calculate Anima Patch
+  description: The anima patch completion time is calculated
   fields:
     username:
       name: Username
