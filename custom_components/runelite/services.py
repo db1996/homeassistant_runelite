@@ -614,7 +614,7 @@ class RuneLiteFarmingServices:
         else:
             username = self.get_default_username()
 
-        entity_id = f"sensor.runelite_{username}_big_compost"
+        entity_id = f"sensor.runelite_{username}_compost_bin"
         completion_time = datetime.now(timezone.utc) + timedelta(minutes=90)
         update_data = {
             "completion_time": completion_time,
