@@ -12,6 +12,7 @@ from custom_components.runelite.sensors.slayer_task import SlayerTaskSensor
 from custom_components.runelite.sensors.last_quest import LastQuestSensor
 from custom_components.runelite.sensors.inventory import InventorySensor, EquipmentSensor
 from custom_components.runelite.sensors.current_activity import CurrentActivitySensor
+from custom_components.runelite.sensors.miscellania import MiscellaniaCofferSensor, MiscellaniaApprovalSensor
 from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers import config_validation as cv
@@ -80,6 +81,16 @@ SET_ENTITY_DATA_SCHEMA = vol.Schema(
         vol.Optional("free_slots"): vol.All(int, vol.Range(min=0, max=28)),
         vol.Optional("worn"): dict,
         vol.Optional("activity"): cv.string,
+        # Miscellania sensors. Times are sent empty when they no longer apply.
+        vol.Optional("coffer"): vol.All(int, vol.Range(min=0, max=7500000)),
+        vol.Optional("approval"): vol.All(int, vol.Range(min=0, max=100)),
+        vol.Optional("royal_trouble"): cv.boolean,
+        vol.Optional("threshold"): vol.All(int, vol.Range(min=0)),
+        vol.Optional("last_updated"): vol.Any("", cv.datetime),
+        vol.Optional("last_visit"): vol.Any("", cv.datetime),
+        vol.Optional("threshold_time"): vol.Any("", cv.datetime),
+        vol.Optional("empty_time"): vol.Any("", cv.datetime),
+        vol.Optional("spending_paused_time"): vol.Any("", cv.datetime),
     }
 )
 
@@ -130,6 +141,25 @@ SET_FARMING_TICK_OFFSET_SCHEMA = vol.Schema(
 SET_PATCH_DIRECTLY_SCHEMA = vol.Schema(
     {
         vol.Optional("username"): cv.string
+    }
+)
+
+MISCELLANIA_SET_COFFER_SCHEMA = vol.Schema(
+    {
+        vol.Optional("username"): cv.string,
+        vol.Required("coffer"): vol.All(vol.Coerce(int), vol.Range(min=0, max=7500000)),
+        # 0 picks the optimal amount for the Royal Trouble state.
+        vol.Optional("threshold"): vol.All(vol.Coerce(int), vol.Range(min=0, max=7500000)),
+        vol.Optional("royal_trouble"): cv.boolean,
+    }
+)
+
+MISCELLANIA_SET_APPROVAL_SCHEMA = vol.Schema(
+    {
+        vol.Optional("username"): cv.string,
+        vol.Required("approval"): vol.All(vol.Coerce(int), vol.Range(min=0, max=100)),
+        vol.Optional("threshold"): vol.All(vol.Coerce(int), vol.Range(min=25, max=100)),
+        vol.Optional("royal_trouble"): cv.boolean,
     }
 )
 
@@ -249,6 +279,27 @@ class RuneLiteFarmingServices:
             "reset_big_compost",
             self.async_reset_big_compost_services, 
             schema=SET_PATCH_DIRECTLY_SCHEMA,
+        )
+
+        self.hass.services.async_register(
+            DOMAIN,
+            "miscellania_visited",
+            self.async_miscellania_visited_service,
+            schema=SET_PATCH_DIRECTLY_SCHEMA,
+        )
+
+        self.hass.services.async_register(
+            DOMAIN,
+            "miscellania_set_coffer",
+            self.async_miscellania_set_coffer_service,
+            schema=MISCELLANIA_SET_COFFER_SCHEMA,
+        )
+
+        self.hass.services.async_register(
+            DOMAIN,
+            "miscellania_set_approval",
+            self.async_miscellania_set_approval_service,
+            schema=MISCELLANIA_SET_APPROVAL_SCHEMA,
         )
 
         self.hass.services.async_register(
@@ -379,6 +430,16 @@ class RuneLiteFarmingServices:
             await self.async_update_entity_data(entity_id, update_data)
         return handler
     
+    def _find_entity(self, entity_id: str):
+        """Find one of this integration's entities by entity_id, the same way async_update_entity_data does."""
+        object_id = entity_id.split(".", 1)[1] if "." in entity_id else entity_id
+        for entry_data in self.hass.data.get(DOMAIN, {}).values():
+            entities_map = entry_data.get("entities", {})
+            for key in (object_id, entity_id, sanitize(entity_id)):
+                if key in entities_map:
+                    return entities_map[key]
+        return None
+
     async def async_update_entity_data(self, entity_id: str, data: dict) -> None:
         """Set data for a specific entity."""
         integration_data = self.hass.data.get(DOMAIN, {})
@@ -410,7 +471,8 @@ class RuneLiteFarmingServices:
             # get instance of the sensor entity
             if isinstance(sensor_entity, (FarmingPatchTypeSensor, FarmingContractSensor, FarmingTickOffsetSensor, BirdhousesSensor, DailySensor, OsrsActivitySensor, OsrsSkillSensor, CompostBinSensor,
                                           PlayerRunEnergy, PlayerHealth, PlayerPrayer, PlayerSpecialAttack, PlayerStatusEffects, PlayerStatus, OsrsSkillSensor, AgressionSensor,
-                                          SlayerTaskSensor, LastQuestSensor, InventorySensor, EquipmentSensor, CurrentActivitySensor)):
+                                          SlayerTaskSensor, LastQuestSensor, InventorySensor, EquipmentSensor, CurrentActivitySensor,
+                                          MiscellaniaCofferSensor, MiscellaniaApprovalSensor)):
                 _LOGGER.debug(f"Updating entity '{entity_id}' (lookup keys: {lookup_keys}) with data: {data}")
                 await sensor_entity.update_data(data)
                 return
@@ -514,6 +576,35 @@ class RuneLiteFarmingServices:
             "status": "in_progress",
         }
         await self.async_update_entity_data(entity_id, update_data)
+
+    def _miscellania_sensors(self, service: ServiceCall):
+        username = (service.data.get("username") or self.get_default_username()).replace(" ", "_").lower()
+        coffer = self._find_entity(f"sensor.runelite_{username}_miscellania_coffer")
+        approval = self._find_entity(f"sensor.runelite_{username}_miscellania_approval")
+        if not isinstance(coffer, MiscellaniaCofferSensor) or not isinstance(approval, MiscellaniaApprovalSensor):
+            _LOGGER.warning("Miscellania sensors not found for %s.", username)
+            return None, None
+
+        # Royal Trouble belongs to the account, so it applies to both sensors.
+        if "royal_trouble" in service.data:
+            coffer.set_royal_trouble(service.data["royal_trouble"])
+            approval.set_royal_trouble(service.data["royal_trouble"])
+        return coffer, approval
+
+    async def async_miscellania_visited_service(self, service: ServiceCall) -> None:
+        coffer, _ = self._miscellania_sensors(service)
+        if coffer:
+            coffer.mark_visited()
+
+    async def async_miscellania_set_coffer_service(self, service: ServiceCall) -> None:
+        coffer, _ = self._miscellania_sensors(service)
+        if coffer:
+            coffer.set_coffer(service.data["coffer"], service.data.get("threshold"))
+
+    async def async_miscellania_set_approval_service(self, service: ServiceCall) -> None:
+        _, approval = self._miscellania_sensors(service)
+        if approval:
+            approval.set_approval(service.data["approval"], service.data.get("threshold"))
 
     async def async_reset_big_compost_services(self, service: ServiceCall) -> None:
         """Reset the big compost."""

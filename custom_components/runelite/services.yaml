@@ -633,6 +633,86 @@ fetch_osrs_highscores:
       selector:
         text:
 
+miscellania_visited:
+  name: Miscellania visited
+  description: Marks that you visited the Kingdom of Miscellania now. The kingdom stops spending coins after 30 days without a visit, so this restarts that countdown.
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+
+miscellania_set_coffer:
+  name: Set Miscellania coffer
+  description: Sets the coins in the Miscellania coffer as of now and recalculates when it drops below the threshold and runs empty.
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+    coffer:
+      required: true
+      name: Coffer
+      description: Coins in the coffer right now.
+      selector:
+        number:
+          min: 0
+          max: 7500000
+          step: 1000
+          mode: box
+    threshold:
+      required: false
+      name: Coffer threshold
+      description: Coffer amount to warn at. 0 picks the optimal amount, 500k or 750k after Royal Trouble. Leave empty to keep the current threshold.
+      selector:
+        number:
+          min: 0
+          max: 7500000
+          step: 1000
+          mode: box
+    royal_trouble:
+      required: false
+      name: Royal Trouble completed
+      description: Whether you completed Royal Trouble. This raises the daily coffer cap to 75k and slows the approval decay to 1%. Applies to both Miscellania sensors.
+      selector:
+        boolean:
+
+miscellania_set_approval:
+  name: Set Miscellania approval
+  description: Sets the Miscellania approval rating as of now and recalculates when it drops below the threshold.
+  fields:
+    username:
+      name: Username
+      description: The username of the player. If you only use one account, there is no need to fill this in
+      selector:
+        text:
+    approval:
+      required: true
+      name: Approval
+      description: Approval rating right now, in percent.
+      selector:
+        number:
+          min: 0
+          max: 100
+          unit_of_measurement: "%"
+    threshold:
+      required: false
+      name: Approval threshold
+      description: Approval percentage to warn at. Leave empty to keep the current threshold.
+      selector:
+        number:
+          min: 25
+          max: 100
+          unit_of_measurement: "%"
+    royal_trouble:
+      required: false
+      name: Royal Trouble completed
+      description: Whether you completed Royal Trouble. This raises the daily coffer cap to 75k and slows the approval decay to 1%. Applies to both Miscellania sensors.
+      selector:
+        boolean:
+
 reset_all_dailies:
   name: Reset All Dailies
   description: Resets all daily tasks for the specified username.

@@ -28,6 +28,7 @@ from .sensors.slayer_task import SlayerTaskSensor
 from .sensors.last_quest import LastQuestSensor
 from .sensors.inventory import InventorySensor, EquipmentSensor
 from .sensors.current_activity import CurrentActivitySensor
+from .sensors.miscellania import MiscellaniaCofferSensor, MiscellaniaApprovalSensor
 from .helpers import sanitize
 
 DOMAIN = "runelite"
@@ -143,6 +144,8 @@ async def async_setup_entry(
     entities.append(InventorySensor(username))
     entities.append(EquipmentSensor(username))
     entities.append(CurrentActivitySensor(username))
+    entities.append(MiscellaniaCofferSensor(username))
+    entities.append(MiscellaniaApprovalSensor(username))
 
     async_add_entities(entities)
 
